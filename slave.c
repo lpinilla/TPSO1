@@ -15,7 +15,8 @@ int main(void){
 	//Una cola de los nombres de archivos y otra para los hashes
 	Queue file_names, hashes;
 	queueInit(&file_names, sizeof(char *));
-	queueInit(&hashes, sizeof(char) * MD5LENGTH);
+	queueInit(&hashes, sizeof(char) * MD5LENGTH); //revisar si lo necesitamos
+	read_file_names(file_names);
 }
 
 //leer los nombres de los archivos de stdin
@@ -29,6 +30,7 @@ void read_file_names(Queue q){
 
 int process_hash(char * file_name){
 	//call md5sum, hay que redireccionar el stdout para que vuelva el hash
+	
 }
 
 void ask_for_more_files(Queue q){
