@@ -37,7 +37,7 @@ void ask_for_more_files(Queue q){
 char * grab_hash(char * md5sum_output){
 	//TODO: este vector esta en el stack, hay que fijarse si no va a molestar y
 	//si hay que crear un char * con malloc
-	char ret[MD5LENGTH]; 
+	char ret[MD5LENGTH * sizeof(char)]; 
 	for(int i = 0; i < MD5LENGTH; i++){
 		ret[i] = md5sum_output[i];
 	} 
