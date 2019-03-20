@@ -19,11 +19,10 @@ clean:
 	rm -f $(TARGETS)
 	rm -f $(SOURCES)
 
-debug:
-	all
-	cppcheck $(TARGETS)
-	cppcheck $(SOURCES)
+debug: all
+	cppcheck $(TARGETS:=.c)
+	cppcheck $(SOURCES:=.c)
 	
-.PHONY: all
+.PHONY: all, debug
 
 	
