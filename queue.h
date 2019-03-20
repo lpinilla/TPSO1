@@ -1,5 +1,7 @@
-#ifndef _QUEUE_H_
-#define _QUEUE_H_
+#ifndef __QUEUE_H_
+#define __QUEUE_H_
+
+#include <stdio.h>
 
 //extraído de https://codereview.stackexchange.com/questions/141238/implementing-a-generic-queue-in-c
 
@@ -23,7 +25,5 @@ void dequeue(Queue *, void *);
 void queuePeek(Queue *, void *);
 void clearQueue(Queue *);
 int getQueueSize(Queue *);
-
-
 
 #endif

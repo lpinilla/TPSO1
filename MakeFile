@@ -1,0 +1,17 @@
+#MakeFile para correr los archivos
+
+
+TARGETS = queue slave
+
+CROSS_TOOL =
+CC_C = $(CROSS_TOOL) gcc
+
+CFLAGS = -Wall -Werror -g -std=99
+
+all : clean $(TARGETS)
+
+$(TARGETS):
+	$(CC_C) $(CFLAGS) $@.c -o $@
+
+clean:
+	rm -f $(TARGETS)
