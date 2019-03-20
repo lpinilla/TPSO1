@@ -16,10 +16,10 @@ $(TARGETS):
 	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@
 
 clean:
-	rm -f $(TARGETS)
-	rm -f $(SOURCES)
+	rm -f $(TARGETS) $(TARGETS:=.o)
+	rm -f $(SOURCES) $(SOURCES:=.o)
 
-debug: all
+debug: all #primero limpiar y compilar todo
 	cppcheck $(TARGETS:=.c)
 	cppcheck $(SOURCES:=.c)
 	
