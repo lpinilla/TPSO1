@@ -3,9 +3,29 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
 
 
-//My propio framework de testing
+//Mi propio framework de testing
+
+//              TASTEFUL
+//              _, . '__ . 
+//           '_(_0o),(__)o().
+//         ,o(__),_)o(_)O,(__)o
+//       o(_,-o(_ )(),(__(_)oO)_
+//       .O(__)o,__).(_ )o(_)Oo_)
+//   .----|   |   |   |   |   |_)0
+//  /  .--|   |   |   |   |   |,_)
+// |  /   |   |   |   |   |   |o(_)
+// |  |   |   |   |   |   |   |_/`)
+// |  |   |   |   |   |   |   |O_) 
+// |  |   |   |   |   |   |   |
+// |  \   |   |   |   |   |   |
+//  \  '--|   |   |   |   |   |
+//   '----|   |   |   |   |   |
+//        |   |   |   |   |   |
+//        \   \   \   /   /   /
+//         `"""""""""""""""""`
 
 enum STATE {SUCCESS = 0, FAILURE};
 
@@ -40,7 +60,7 @@ int main(void){
     //creando un test_suite
     test_suite my_suite = (t_test_suite *) malloc(sizeof(t_test_suite));
     //creando el espacio para los tests
-    int n_of_tests = 2;
+    int n_of_tests = 6;
     my_suite->n_of_tests = n_of_tests;
     my_suite->fun_ptrs = (void (**) ()) malloc(sizeof(void *) * n_of_tests);
     my_suite->fun_ptrs[0] = test1;
@@ -59,23 +79,24 @@ int main(void){
 
 void run_suite(test_suite suite){
     int cpid[suite->n_of_tests];    
+    int child_status = 0;
     for(int i = 0; i < suite->n_of_tests; i++){
         cpid[i] = fork();
-
+        child_status = 0;
         if(cpid[i] == -1){
             perror("Error creating child process");
             exit(EXIT_FAILURE);
         }else if(cpid[i] == 0){ //proceso hijo, el test
             suite->fun_ptrs[i]();
-
-            //aca debería haber algo para que se checkee si estaba bien o mal
-
-            //terminar de correr el hijo
             exit(EXIT_SUCCESS);
         }
-        //si algún hijo devolvió algo mal, indicar que hay una falla en el suite
-        //suite->suite_state = FAILURE;
-        //printf("Un error en el test %d \n", i);
+        waitpid(cpid[i], &child_status, 0);
+        if(WIFEXITED(child_status)){ //terminó todo bien
+            printf("%d: %s \n",i, "PASS");
+        }else{ //al menos un programa terminó mal
+            suite->suite_state = FAILURE;
+            printf("%d: %s \n",i, "FAIL");
+        }
     }
     suite->suite_state = SUCCESS;
 }
