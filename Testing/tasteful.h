@@ -48,15 +48,21 @@ typedef struct{
 
 typedef t_test_suite * test_suite;
 
-void run_all_suites(char * all_suites, int n_of_suites_found);
+void run_all_suites(char ** all_suites, int n_of_suites_found);
 
 /*devuelve un array dinámico de suites en base a los archivos
 **binarios cuyos nombres empiecen con test (o sus variaciones)*/
-char * fetch_all_suites(int n_of_suites_found);
+char ** fetch_all_suites(int n_of_suites_found);
 
 /*devuelve la cantidad de archivos binarios cuyos nombres
 **comienzan con test o alguna variación de este*/
 int find_tests();
+
+/*Llama al comando command por la shell de linux y guarda el
+**resultado en el buffer provisto*/
+void call_command(char * command, char * buffer);
+
+//regex original: grep -P '[tT][eE][sS][tT][a-z]*[A-Z]*[0-9]*[_]*[a-z]*[A-Z]*(?!.)'
 
 #endif
 

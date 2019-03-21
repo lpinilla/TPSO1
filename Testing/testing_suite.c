@@ -2,7 +2,7 @@
 
 //testing suite to test the framework
 
-//eliminar después
+
 void test1(void);
 void test2(void);
 void test3(void);
@@ -13,7 +13,7 @@ void test7(void);
 void test8(void);
 void test9(void);
 void test10(void);
-
+//faltan tests
 
 int main(void){
     //creando un test_suite

@@ -27,29 +27,37 @@ int main(void){
     //primero, encontrar cuantos tests hay
     int n_of_suites_found = find_tests();
     //agarrar todas las suites
-    char * all_suites = fetch_all_suites(n_of_suites_found);
+    char ** all_suites = fetch_all_suites(n_of_suites_found);
     //correr las suites
     run_all_suites(all_suites, n_of_suites_found);
-    
-    //hay que liberar cada suite
+    //hay que liberar el espacio
     free(all_suites);
 }
 
-char * fetch_all_suites(int n_of_suites_found){
-    char * ret = (char *) malloc(MAX_FILE_NAME_LENGTH * sizeof(char) * n_of_suites_found);
+char ** fetch_all_suites(int n_of_suites_found){
     //simplemente agarrar la salida de grep
-    char * buffer = malloc(MAX_FILE_NAME_LENGTH * n_of_suites_found * sizeof(char));
-    call_command("ls | grep -P '[tT][eE][sS][tT][a-z]*[A-Z]*[0-9]*[_]*[a-z]*[A-Z]*(?!.)'", buffer);
-                                                                                                        //agarrar los nombres de los archivos
-
+    char * buffer = (char *) malloc(MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
+    char ** ret = malloc(n_of_suites_found);
+    memset(buffer, 0x0, MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
+    call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*(?!.)'", buffer);
+    //cleaning buffer
+    for(int i = 0; i < (MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char) - 1); i++){
+        if(buffer[i] == '\n'){
+            buffer[i] = 0;
+        }
+    }
+    //printf("%s\n", buffer); //testing
+    //hay que agarrar todos los strings que haya en el buffer
+    
+    ret[0] = "testing_suite";                                       //HARDCODED
     free(buffer);
     return ret;
 }
 
 int find_tests(){ //seguro se puede re optimizar a partir del comando anterior pero bueno
     char * buffer = (char *) malloc(sizeof(int));
-    call_command("ls | grep -P '[tT][eE][sS][tT][a-z]*[A-Z]*[0-9]*[_]*[a-z]*[A-Z]*(?!.)' | wc -l", buffer);
-    int ret = atoi(&buffer);
+    call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*(?!.)' | wc -l", buffer);
+    int ret = atoi(buffer);
     printf("Number of files: %d \n", ret); //testing purposes
     free(buffer);
     return ret;
@@ -77,7 +85,7 @@ void call_command(char * command, char * buffer){
         perror("Error creating child process");
         exit(EXIT_FAILURE);
     }else if(cpid == 0){ //proceso hijo
-        system("ls | grep -P '[tT][eE][sS][tT][a-z]*[A-Z]*[0-9]*[_]*[a-z]*[A-Z]*(?!.)' | wc -l");
+        system(command);
         exit(EXIT_SUCCESS);
     }
     //restablecer el stdout
@@ -85,15 +93,19 @@ void call_command(char * command, char * buffer){
     dup2(stdout_saved, STDOUT_FILENO);
     close(stdout_saved);
     //read input
-    read(fd[0], buffer, 1);
+    while( (read(fd[0], buffer, 1) > 0) && *buffer != '\n' ){
+        buffer++;
+        
+    }
+    
     //destruir el pipe (el extremo de lectura)
     close(fd[0]);
     return;
 }
 
-void run_all_suites(char * all_suites, int n_of_suites_found){
+void run_all_suites(char ** all_suites, int n_of_suites_found){
     //children cpid
-    int cpids[n_of_suites_found];
+    int cpids[n_of_suites_found], child_status[n_of_suites_found];
     for(int i = 0; i < n_of_suites_found; i++){
         cpids[i] = fork();
         if(cpids[i] < 0){
@@ -101,9 +113,14 @@ void run_all_suites(char * all_suites, int n_of_suites_found){
             exit(EXIT_FAILURE);
         }else if(cpids[i] == 0){ //el hijo
             //correr la suite
-            execv(all_suites[i], NULL);
+            char ** args = NULL;
+            execv(all_suites[i], args);
+            printf("halo");
             exit(EXIT_SUCCESS);
         }        
+    }
+    for(int i = 0; i < n_of_suites_found; i++){
+        waitpid(cpids[i], &child_status[n_of_suites_found], 0);
     }
 }
 
