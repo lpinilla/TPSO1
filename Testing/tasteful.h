@@ -8,6 +8,8 @@
 #include <string.h>
 #include <sys/wait.h>
 
+#define MAX_FILE_NAME_LENGTH 32
+
 
 
 //Mi propio framework de testing
@@ -40,16 +42,21 @@ typedef struct{
     int n_of_tests;
     //el estado final una vez corridos los tests (por defecto SUCCESS)
     enum STATE suite_state; 
-    //nombre de la suite
+    //path del suite
     char * suite_name;
 }t_test_suite;
 
 typedef t_test_suite * test_suite;
 
-//un puntero a suites de tests
-typedef test_suite * suites; 
+void run_all_suites(char * all_suites, int n_of_suites_found);
 
+/*devuelve un array dinámico de suites en base a los archivos
+**binarios cuyos nombres empiecen con test (o sus variaciones)*/
+char * fetch_all_suites(int n_of_suites_found);
 
-void run_all_suites(test_suite *);
+/*devuelve la cantidad de archivos binarios cuyos nombres
+**comienzan con test o alguna variación de este*/
+int find_tests();
 
 #endif
+
