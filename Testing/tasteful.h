@@ -1,9 +1,13 @@
+#ifndef _TASTEFUL_H_
+#define _TASTEFUL_H_
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
+
 
 
 //Mi propio framework de testing
@@ -27,23 +31,25 @@
 //        \   \   \   /   /   /
 //         `"""""""""""""""""`
 
-enum STATE {SUCCESS = 0, FAILURE};
+enum STATE {SUCCESS = 0, FAILURE}; //ver si hay que crear un 3er estado default
 
 typedef struct{
     //punteros a puntero a función
     void  (** fun_ptrs) (void);
+    //cantidad de tests que contiene
     int n_of_tests;
+    //el estado final una vez corridos los tests (por defecto SUCCESS)
     enum STATE suite_state; 
+    //nombre de la suite
     char * suite_name;
 }t_test_suite;
 
 typedef t_test_suite * test_suite;
 
-typedef test_suite * suites; //un puntero a suites de tests
+//un puntero a suites de tests
+typedef test_suite * suites; 
 
-void run_suite(test_suite suite);
 
-void assert_equals(const void * a, const void * b, size_t size_of_data);
-void assert_not_equals(const void * a, const void * b, size_t size_of_data);
-void assert_true(int i);
-void assert_false(int i);
+void run_all_suites(test_suite *);
+
+#endif
