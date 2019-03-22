@@ -31,7 +31,7 @@ int main(void){
     //correr las suites
     run_all_suites(all_suites, n_of_suites_found);
     //hay que liberar el espacio
-    free(all_suites);
+    free_space(n_of_suites_found, all_suites);
 }
 
 char ** fetch_all_suites(int n_of_suites_found){
@@ -65,12 +65,10 @@ char ** fetch_all_suites(int n_of_suites_found){
     }
     //printf("%s \n", buffer);
     //printf("Testing function:---------\n");
-    for(int i = 0; i < n_of_suites_found; i++){
+    /*for(int i = 0; i < n_of_suites_found; i++){
         printf("%s \n", ret[i]);
-    }
-    
-
-    //hay que agarrar todos los strings que haya en el buffer
+    }*/
+    //liberar el buffer
     free(buffer);
     return ret;
 }
@@ -146,5 +144,12 @@ void run_all_suites(char ** all_suites, int n_of_suites_found){
     for(int i = 0; i < n_of_suites_found; i++){
         waitpid(cpids[i], &child_status[n_of_suites_found], 0);
     }
+}
+
+void free_space(int n_of_suites_found, char ** all_suites){
+    for(int i = 0; i < n_of_suites_found; i++){
+        free(all_suites[i]);
+    }
+    free(all_suites);
 }
 

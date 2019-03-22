@@ -15,30 +15,47 @@ void test9(void);
 void test10(void);
 //faltan tests
 
+
+
 int main(void){
     //creando un test_suite
-    test_suite my_suite = (t_test_suite *) malloc(sizeof(t_test_suite));
-    //creando el espacio para los tests
-    int n_of_tests = 10;
-    my_suite->n_of_tests = n_of_tests;
-    my_suite->suite_name = "Testing the Framework";
-    my_suite->fun_ptrs = (void (**) ()) malloc(sizeof(void *) * n_of_tests);
-    my_suite->fun_ptrs[0] = test1;
-    my_suite->fun_ptrs[1] = test2;
-    my_suite->fun_ptrs[2] = test3;
-    my_suite->fun_ptrs[3] = test4;
-    my_suite->fun_ptrs[4] = test5;
-    my_suite->fun_ptrs[5] = test6;
-    my_suite->fun_ptrs[6] = test7;
-    my_suite->fun_ptrs[7] = test8;
-    my_suite->fun_ptrs[8] = test9;
-    my_suite->fun_ptrs[9] = test10;
+    test_suite my_suite = create_suite(10, "Testing the Framework");
+
+    add_test(my_suite, test1);
+    add_test(my_suite, test2);
+    add_test(my_suite, test3);
+    add_test(my_suite, test4);
+    add_test(my_suite, test5);
+    add_test(my_suite, test6);
+    add_test(my_suite, test7);
+    add_test(my_suite, test8);
+    add_test(my_suite, test9);
+    add_test(my_suite, test10);
 
     run_suite(my_suite);
-    free (my_suite->fun_ptrs);
+    
+    free(my_suite->fun_ptrs);
     free(my_suite);
 }
 
+
+test_suite create_suite(int n_of_tests, char * suite_name){
+    test_suite my_suite = (t_test_suite *) malloc(sizeof(t_test_suite));
+    my_suite->n_of_tests = n_of_tests;
+    my_suite->suite_name = suite_name;
+    my_suite->fun_index = 0;
+    //creando el espacio para los tests
+    my_suite->fun_ptrs = (void (**) ()) malloc(sizeof(void *) * my_suite->n_of_tests);
+    return my_suite;
+}
+
+void add_test(test_suite suite , void (* fun) ()){
+    if(suite == NULL){
+        return;
+    }
+    suite->fun_ptrs[suite->fun_index] = fun;
+    suite->fun_index++;
+}
 
 void run_suite(test_suite suite){
     printf("----------------------------------------------\n");

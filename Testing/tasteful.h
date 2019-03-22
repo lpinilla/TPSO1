@@ -45,6 +45,9 @@ typedef struct{
     enum STATE suite_state; 
     //path del suite
     char * suite_name;
+    /*índice del array (podría usarlo a futuro para que sea más cómodo
+    **agregar funciones)*/
+    int fun_index;
 }t_test_suite;
 
 typedef t_test_suite * test_suite;
@@ -62,6 +65,9 @@ int find_tests();
 /*Llama al comando command por la shell de linux y guarda el
 **resultado en el buffer provisto*/
 void call_command(char * command, char * buffer);
+
+//hacer todos los free correspondientes
+void free_space(int n_of_suites_found, char ** suites);
 
 //regex original: grep -P '[tT][eE][sS][tT][a-z]*[A-Z]*[0-9]*[_]*[a-z]*[A-Z]*(?!.)'
 

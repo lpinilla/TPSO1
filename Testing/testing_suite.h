@@ -18,5 +18,10 @@ void assert_false(int i);
 //correr todas los tests del suite
 void run_suite(test_suite suite);
 
+//función para inicializar la suite
+test_suite create_suite(int n_of_tests, char * suite_name);
+
+//función para agregar un test al suite
+void add_test(test_suite suite , void (* fun) ());
 
 #endif
