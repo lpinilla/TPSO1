@@ -59,20 +59,6 @@ void run_suite(test_suite suite){
             suite->fun_ptrs[i]();
             exit(EXIT_SUCCESS);
         }
-
-        //dejo esto acá por las dudas, hay que ver si estaba bien
-        //acá o si hice bien en separarlo
-
-
-        /*waitpid(cpid[i], &child_status, 0);
-        if(WIFEXITED(child_status)){//si terminó
-            if(!WEXITSTATUS(child_status)){
-                printf("%d: %s \n",i, "PASS");
-            }else{
-                suite->suite_state = FAILURE;
-                printf("%d: %s \n",i, "FAIL");
-            }
-        }*/
     }
     /*Esperar a que los procesos terminen, lo separo porque si
     **esta todo junto, obliga a que los tests se hagan secuencialmente

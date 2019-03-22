@@ -8,7 +8,8 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define MAX_FILE_NAME_LENGTH 32
+//tamaño maximo de nombre de los archivos de test
+#define MAX_FILE_NAME_LENGTH 16
 
 
 

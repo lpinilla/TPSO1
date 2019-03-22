@@ -47,9 +47,30 @@ char ** fetch_all_suites(int n_of_suites_found){
         }
     }
     //printf("%s\n", buffer); //testing
-    //hay que agarrar todos los strings que haya en el buffer
+
+    //encontrar los nombres de los archivos y guardarlos en ret
+    int aux = 0, ret_index = 0;
+    for(int i = 0; i < (MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char) - 1); i++){
+        if(buffer[i] != 0){
+            aux++;
+            if(buffer[i] == '|'){ //encontramos el nombre de un archivo
+                //printf("aux: %d i: %d\n", aux, i); //testing
+                ret[ret_index] = malloc(aux * sizeof(char));    //hay que liberarlo
+                strncpy(ret[ret_index], &buffer[i - aux + 1], (size_t) aux - 1);
+                ret[ret_index + aux] = 0;
+                aux = 0;
+                ret_index++;
+            }
+        }
+    }
+    //printf("%s \n", buffer);
+    //printf("Testing function:---------\n");
+    for(int i = 0; i < n_of_suites_found; i++){
+        printf("%s \n", ret[i]);
+    }
     
-    ret[0] = "testing_suite";                                       //HARDCODED
+
+    //hay que agarrar todos los strings que haya en el buffer
     free(buffer);
     return ret;
 }
@@ -93,7 +114,10 @@ void call_command(char * command, char * buffer){
     dup2(stdout_saved, STDOUT_FILENO);
     close(stdout_saved);
     //read input
-    while( (read(fd[0], buffer, 1) > 0) && *buffer != '\n' ){
+    while( (read(fd[0], buffer, 1) > 0)){
+        if(*buffer == '\n'){
+            *buffer = '|';
+        }
         buffer++;
         
     }
