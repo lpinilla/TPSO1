@@ -77,7 +77,7 @@ int find_tests(){ //seguro se puede re optimizar a partir del comando anterior p
     char * buffer = (char *) malloc(sizeof(int));
     call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*(?!.)' | wc -l", buffer);
     int ret = atoi(buffer);
-    printf("Number of files: %d \n", ret); //testing purposes
+    //printf("Number of files: %d \n", ret); //testing purposes
     free(buffer);
     return ret;
 }
@@ -137,7 +137,6 @@ void run_all_suites(char ** all_suites, int n_of_suites_found){
             //correr la suite
             char ** args = NULL;
             execv(all_suites[i], args);
-            printf("halo");
             exit(EXIT_SUCCESS);
         }        
     }

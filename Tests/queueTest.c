@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "queue.h"
+#include "../queue.h"
 
 //extraído de https://codereview.stackexchange.com/questions/141238/implementing-a-generic-queue-in-c
-
+//modificado para que acompañe la estructura del framework
 int main()
 {
     int val;
