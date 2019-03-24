@@ -22,6 +22,8 @@ $(TARGETS):
 clean:
 	rm -f $(TARGETS) $(TARGETS:=.o)
 	rm -f $(SOURCES) $(SOURCES:=.o)
+	rm -f $(TESTS) $(TESTS:=.o)
+	rm -f $(TEST_SOURCES) $(TEST_SOURCES:=.o)
 
 debug: all #primero limpiar y compilar todo
 	#checkeos cppcheck

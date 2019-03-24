@@ -61,7 +61,7 @@ void run_suite(test_suite suite){
 
     //TODO: hay que ver qué pasa si un proceso se cuelga
 
-    suite->suite_state? printf("\t \t \t The Suite failed \n") : printf("The Suite passed \n"); 
+    suite->suite_state? printf("\t \t \t The Suite failed \n") : printf("\t \t \t The Suite passed \n"); 
     printf("----------------------------------------------\n");
 }
 

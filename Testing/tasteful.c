@@ -26,6 +26,11 @@
 int main(void){
     //primero, encontrar cuantos tests hay
     int n_of_suites_found = find_tests();
+    //imprimir cartelito
+     printf("----------------------------------------------\n");
+    printf("\t Tasteful Framework \n");
+    printf("----------------------------------------------\n");
+    printf("Number of Tests Found: %d \n", n_of_suites_found);
     //agarrar todas las suites
     char ** all_suites = fetch_all_suites(n_of_suites_found);
     //correr las suites
@@ -77,7 +82,6 @@ int find_tests(){ //seguro se puede re optimizar a partir del comando anterior p
     char * buffer = (char *) malloc(sizeof(int));
     call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*(?!.)' | wc -l", buffer);
     int ret = atoi(buffer);
-    printf("Number of Tests Found: %d \n", ret);
     free(buffer);
     return ret;
 }
@@ -138,11 +142,12 @@ void run_all_suites(char ** all_suites, int n_of_suites_found){
             char ** args = NULL;
             execv(all_suites[i], args);
             exit(EXIT_SUCCESS);
-        }        
+        }
+        waitpid(cpids[i], &child_status[n_of_suites_found], 0);        
     }
-    for(int i = 0; i < n_of_suites_found; i++){
+    /*for(int i = 0; i < n_of_suites_found; i++){
         waitpid(cpids[i], &child_status[n_of_suites_found], 0);
-    }
+    }*/
 }
 
 void free_space(int n_of_suites_found, char ** all_suites){
