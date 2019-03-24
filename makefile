@@ -25,7 +25,6 @@ debug: all #primero limpiar y compilar todo
 	cppcheck $(SOURCES:=.c)
 	#checkeos de los binarios con valgrind
 	$(foreach f, $(TARGETS:=), valgrind ./$f)
-	$(foreach f, $(SOURCES:=), valgrind ./$f)
 
 #test: correr todas las suites de test
 	

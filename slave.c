@@ -6,7 +6,7 @@ int main(void){
 	//Queue hashes;
 	queueInit(&file_names, sizeof(char *));
 	//queueInit(&hashes, sizeof(char) * MD5LENGTH); //revisar si lo necesitamos
-	read_file_names(file_names);
+	//read_file_names(file_names);
 
 
 	//al finalizar hay que liberar la cola
@@ -25,10 +25,10 @@ void read_file_names(Queue q){
 }
 
 void process_hash(char * file_name){
-	char * command_name = "md5sum";
+	/*char * command_name = "md5sum";
 	char * full_command; //combinar para que sea "md5sum file_name"
 	char * command_output; //calcular bien el espacio
-	call_command(full_command, command_output);
+	call_command(full_command, command_output);*/
 	return;
 }
 
