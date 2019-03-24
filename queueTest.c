@@ -29,5 +29,7 @@ int main()
         printf("%d has been dequeued.\n", val + 1);
     }
 
+    clearQueue(&q);
+
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "testing_suite.h"
 
+//estaría bueno que el usuario no tenga que poner la cantidad de tests y que la calcule
 test_suite create_suite(int n_of_tests, char * suite_name){
     test_suite my_suite = (t_test_suite *) malloc(sizeof(t_test_suite));
     my_suite->n_of_tests = n_of_tests;
