@@ -1,7 +1,9 @@
-#ifndef __QUEUE_H_
-#define __QUEUE_H_
+#ifndef _QUEUE_H_
+#define _QUEUE_H_
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //extraído de https://codereview.stackexchange.com/questions/141238/implementing-a-generic-queue-in-c
 

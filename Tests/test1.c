@@ -33,6 +33,8 @@ int main(void){
     free(my_suite);
 }
 
+//cambiar los 1eros 2 tests
+
 void test1(){
     printf("hello \n");
     return;
