@@ -1,3 +1,6 @@
+#ifndef _UTILS_H_
+#define _UTILS_H_
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
@@ -47,3 +50,5 @@ void call_command(char * command, char * buffer){
     close(fd[0]);
     return;
 }
+
+#endif

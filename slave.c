@@ -1,11 +1,4 @@
-#include "queue.h"
 #include "slave.h"
-
-#include <stdio.h>
-#include <stddef.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
 
 int main(void){
 	//Una cola de los nombres de archivos y otra para los hashes
@@ -31,22 +24,15 @@ void read_file_names(Queue q){
 	}
 }
 
-int process_hash(char * file_name){
-	//call md5sum, hay que redireccionar el stdout para que vuelva el hash
-	//el hash lo devuelve tipo: HASH NOMBRE DEL ARCHIVO así que hay que parsear
-
-	return 0; //para compilar
+void process_hash(char * file_name){
+	char * command_name = "md5sum";
+	char * full_command; //combinar para que sea "md5sum file_name"
+	char * command_output; //calcular bien el espacio
+	call_command(full_command, command_output);
+	return;
 }
 
 void ask_for_more_files(Queue q){
 	//avisarle al padre
 	//read_file_names(q);
-}
-
-char * grab_hash(char * md5sum_output){
-	char * ret = malloc(MD5LENGTH * sizeof(char)); //TODO: REVISAR DONDE HAY QUE HACER EL FREE
-	for(int i = 0; i < MD5LENGTH; i++){
-		ret[i] = md5sum_output[i];
-	} 
-	return ret;
 }
