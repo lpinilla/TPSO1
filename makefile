@@ -3,7 +3,7 @@
 #arhivos que tienen un main
 TARGETS = slave
 #arhivos que no tienen un main
-SOURCES = queue
+SOURCES = utilities/sources/queue
 #testing
 TASTEFUL = tasteful
 TESTS = Tests/queueTest Tests/test1
@@ -14,7 +14,7 @@ CC_C = $(CROSS_TOOL) gcc
 
 CFLAGS = -Wall -Werror -g
 
-all: clean $(TARGETS)
+all: clean $(TARGETS).o
 
 $(TARGETS):
 	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@.o
