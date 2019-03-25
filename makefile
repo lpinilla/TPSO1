@@ -17,7 +17,7 @@ CFLAGS = -Wall -Werror -g
 all: clean $(TARGETS)
 
 $(TARGETS):
-	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@
+	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@.o
 
 clean:
 	rm -f $(TARGETS) $(TARGETS:=.o)
