@@ -6,7 +6,7 @@ TARGETS = slave
 SOURCES = queue
 #testing
 TASTEFUL = tasteful
-TESTS = Tests/queueTest Tests/test1
+TESTS = Tests/queueTest Tests/test1 Tests/slave_test
 TEST_SOURCES = queue Testing/testing_suite
 
 CROSS_TOOL =
@@ -29,6 +29,8 @@ debug: all #primero limpiar y compilar todo
 	#checkeos cppcheck
 	cppcheck $(TARGETS:=.c)
 	cppcheck $(SOURCES:=.c)
+	cppcheck $(TESTS:=.c)
+	cppcheck $(TEST_SOURCES:=.c)
 	#checkeos de los binarios con valgrind
 	$(foreach f, $(TARGETS:=), valgrind ./$f)
 

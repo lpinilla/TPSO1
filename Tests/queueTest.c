@@ -10,16 +10,15 @@ void queue_erase_test();
 
 int main()
 {
-    test_suite my_suite = create_suite(3, "Testing the Queue");
+    create_suite("Testing the Queue");
 
-    add_test(my_suite, initialize_test);
-    add_test(my_suite, peek_value_test);
-    add_test(my_suite, queue_erase_test);
+    add_test(initialize_test);
+    add_test(peek_value_test);
+    add_test(queue_erase_test);
 
-    run_suite(my_suite);
+    run_suite();
     
-    free(my_suite->fun_ptrs);
-    free(my_suite);
+    clear_suite();
 
     return 0;
 }

@@ -10,19 +10,18 @@ void test6(void);
 
 int main(void){
    //creando un test_suite
-    test_suite my_suite = create_suite(6, "Testing the Framework");
+    create_suite("Testing the Framework");
 
-    add_test(my_suite, test1);
-    add_test(my_suite, test2);
-    add_test(my_suite, test3);
-    add_test(my_suite, test4);
-    add_test(my_suite, test5);
-    add_test(my_suite, test6);
+    add_test(test1);
+    add_test(test2);
+    add_test(test3);
+    add_test(test4);
+    add_test(test5);
+    add_test(test6);
 
-    run_suite(my_suite);
+    run_suite();
     
-    free(my_suite->fun_ptrs);
-    free(my_suite);
+    clear_suite();
 }
 
 //cambiar los 1eros 2 tests
