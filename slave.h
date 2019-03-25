@@ -3,8 +3,7 @@
 
 //librerías propias
 #include "utilities/queue.h"
-#include "slave.h"
-#include "utils.c"
+#include "utilities/utils.h"
 //librerías de C
 #include <stdio.h>
 #include <stddef.h>
