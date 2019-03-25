@@ -29,6 +29,8 @@ debug: all #primero limpiar y compilar todo
 	#checkeos cppcheck
 	cppcheck $(TARGETS:=.c)
 	cppcheck $(SOURCES:=.c)
+	cppcheck $(TESTS:=.c)
+	cppcheck $(TEST_SOURCES:=.c)
 	#checkeos de los binarios con valgrind
 	$(foreach f, $(TARGETS:=).o, valgrind ./$f)
 
@@ -39,6 +41,6 @@ test: all $(TESTS) #correr todas las suites de test
 $(TESTS):
 	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@.o
 	
-.PHONY: all, debug
+.PHONY: all, debug, test
 
 	

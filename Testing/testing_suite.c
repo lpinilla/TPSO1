@@ -1,25 +1,29 @@
 #include "testing_suite.h"
 
-//estaría bueno que el usuario no tenga que poner la cantidad de tests y que la calcule
-test_suite create_suite(int n_of_tests, char * suite_name){
-    test_suite my_suite = (t_test_suite *) malloc(sizeof(t_test_suite));
-    my_suite->n_of_tests = n_of_tests;
-    my_suite->suite_name = suite_name;
-    my_suite->fun_index = 0;
+
+void create_suite(char * suite_name){
+    suite = (t_test_suite *) malloc(sizeof(t_test_suite));
+    //suite->n_of_tests = n_of_tests;
+    suite->suite_name = suite_name;
+    suite->fun_index = 0;
+    suite->fun_ptrs = NULL;
     //creando el espacio para los tests
-    my_suite->fun_ptrs = (void (**) ()) malloc(sizeof(void *) * my_suite->n_of_tests);
-    return my_suite;
 }
 
-void add_test(test_suite suite , void (* fun) ()){
+void add_test(void (* fun) ()){
     if(suite == NULL){
         return;
     }
+    if((suite->fun_index % ARRAY_STEP) == 0){
+        suite->fun_ptrs = (void (**)()) realloc((void (**)()) suite->fun_ptrs,
+                         sizeof(void *) * ARRAY_STEP * (1 + suite->fun_index));
+    }
     suite->fun_ptrs[suite->fun_index] = fun;
     suite->fun_index++;
+    suite->n_of_tests++;
 }
 
-void run_suite(test_suite suite){
+void run_suite(){
     printf("----------------------------------------------\n");
     printf("Testing Suite \" %s \" \n", suite->suite_name);
     printf("----------------------------------------------\n");
@@ -76,6 +80,11 @@ void run_suite(test_suite suite){
         printf("\033[0m");
     }
     printf("----------------------------------------------\n");
+}
+
+void clear_suite(){
+    free(suite->fun_ptrs);
+    free(suite);
 }
 
 
