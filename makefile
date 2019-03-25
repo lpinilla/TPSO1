@@ -30,7 +30,7 @@ debug: all #primero limpiar y compilar todo
 	cppcheck $(TARGETS:=.c)
 	cppcheck $(SOURCES:=.c)
 	#checkeos de los binarios con valgrind
-	$(foreach f, $(TARGETS:=), valgrind ./$f)
+	$(foreach f, $(TARGETS:=).o, valgrind ./$f)
 
 test: all $(TESTS) #correr todas las suites de test
 	$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL).o
