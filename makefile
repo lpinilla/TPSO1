@@ -33,11 +33,11 @@ debug: all #primero limpiar y compilar todo
 	$(foreach f, $(TARGETS:=), valgrind ./$f)
 
 test: all $(TESTS) #correr todas las suites de test
-	$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL)
-	cd Tests && ./$(TASTEFUL)
+	$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL).o
+	cd Tests && ./$(TASTEFUL).o
 	
 $(TESTS):
-	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@
+	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@.o
 	
 .PHONY: all, debug
 
