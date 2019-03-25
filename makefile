@@ -6,7 +6,7 @@ TARGETS = slave
 SOURCES = queue
 #testing
 TASTEFUL = tasteful
-TESTS = Tests/queueTest Tests/test1 Tests/slave_test
+TESTS = Tests/queueTest Tests/test1
 TEST_SOURCES = queue Testing/testing_suite
 
 CROSS_TOOL =
@@ -41,6 +41,6 @@ test: all $(TESTS) #correr todas las suites de test
 $(TESTS):
 	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@
 	
-.PHONY: all, debug
+.PHONY: all, debug, test
 
 	

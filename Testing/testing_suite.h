@@ -29,9 +29,17 @@ typedef struct{
 typedef t_test_suite * test_suite;
 
 //los asserts posibles que se pueden hacer
+
+//verifica si el elemento a es igual al elemento b indicando el tamaño del dato
 void assert_equals(const void * a, const void * b, size_t size_of_data);
+
+//verifica si el elemento a es distinto al elemento b indicando el tamaño del dato
 void assert_not_equals(const void * a, const void * b, size_t size_of_data);
+
+//verifica si el resultado de la operación que se le evalúe es verdadera
 void assert_true(int i);
+
+//verifica si el resultado de la operación que se le evalúe es falsa
 void assert_false(int i);
 
 //correr todas los tests del suite

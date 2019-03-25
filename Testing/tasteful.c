@@ -26,6 +26,7 @@
 int main(void){
     //primero, encontrar cuantos tests hay
     int n_of_suites_found = find_tests();
+    if(n_of_suites_found == 0) return 0;
     //imprimir cartelito
      printf("----------------------------------------------\n");
     printf("\t Tasteful Framework \n");
