@@ -7,7 +7,7 @@ SOURCES = utilities/sources/queue
 #testing
 TASTEFUL = tasteful
 TESTS = Tests/queueTest Tests/test1
-TEST_SOURCES = queue Testing/testing_suite
+TEST_SOURCES = utilities/sources/queue Testing/testing_suite
 
 CROSS_TOOL =
 CC_C = $(CROSS_TOOL) gcc
