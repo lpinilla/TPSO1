@@ -6,3 +6,7 @@
 ## binarios de test
 
 Tests/*.o
+
+## carpetas ocultas
+
+.*
