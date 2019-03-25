@@ -48,20 +48,33 @@ void run_suite(test_suite suite){
         waitpid(cpid[i], &child_status, 0);
         if(WIFEXITED(child_status)){//si terminó
             if(!WEXITSTATUS(child_status)){
+                printf("\033[0;32m");
                 printf("%d: %s \n",i, "PASS");
+                printf("\033[0m");
             }else{
                 suite->suite_state = FAILURE;
+                printf("\033[0;31m");
                 printf("%d: %s \n",i, "FAIL");
+                printf("\033[0m");
             }
         }else{ //el proceso no terminó
             suite->suite_state = FAILURE;
+            printf("\033[0;31m");
             printf("%d: %s \n",i, "FAIL");
+            printf("\033[0m");
         }
     }
 
     //TODO: hay que ver qué pasa si un proceso se cuelga
-
-    suite->suite_state? printf("\t \t \t The Suite failed \n") : printf("\t \t \t The Suite passed \n"); 
+    if(suite->suite_state){
+        printf("\033[0;31m");
+        printf("\t \t \t The Suite failed \n");
+        printf("\033[0m");
+    }else{
+        printf("\033[0;32m");
+        printf("\t \t \t The Suite passed \n");
+        printf("\033[0m");
+    }
     printf("----------------------------------------------\n");
 }
 
