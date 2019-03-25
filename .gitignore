@@ -1,0 +1,12 @@
+## binarios de programa principal
+
+*.so
+
+
+## binarios de test
+
+Tests/*.so
+
+## carpetas ocultas
+
+.*

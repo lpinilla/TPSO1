@@ -1,13 +1,15 @@
 #MakeFile para compilar o debugear los archivos
 
+#todos los archivos binarios van a tener extensión .so
+
 #arhivos que tienen un main
 TARGETS = slave
 #arhivos que no tienen un main
-SOURCES = queue
+SOURCES = utilities/sources/queue utilities/sources/utils
 #testing
 TASTEFUL = tasteful
 TESTS = Tests/queueTest Tests/test1
-TEST_SOURCES = queue Testing/testing_suite
+TEST_SOURCES = utilities/sources/queue Testing/testing_suite utilities/sources/utils
 
 CROSS_TOOL =
 CC_C = $(CROSS_TOOL) gcc
@@ -17,12 +19,12 @@ CFLAGS = -Wall -Werror -g
 all: clean $(TARGETS)
 
 $(TARGETS):
-	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@
+	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@.so
 
 clean:
-	rm -f $(TARGETS) $(TARGETS:=.o)
+	rm -f $(TARGETS) $(TARGETS:=.o) $(TARGETS:=.so)
 	rm -f $(SOURCES) $(SOURCES:=.o)
-	rm -f $(TESTS) $(TESTS:=.o)
+	rm -f $(TESTS) $(TESTS:=.o) $(TESTS:=.so)
 	rm -f $(TEST_SOURCES) $(TEST_SOURCES:=.o)
 
 debug: all #primero limpiar y compilar todo
@@ -32,14 +34,14 @@ debug: all #primero limpiar y compilar todo
 	cppcheck $(TESTS:=.c)
 	cppcheck $(TEST_SOURCES:=.c)
 	#checkeos de los binarios con valgrind
-	$(foreach f, $(TARGETS:=), valgrind ./$f)
+	$(foreach f, $(TARGETS:=).so, valgrind ./$f)
 
 test: all $(TESTS) #correr todas las suites de test
-	$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL)
-	cd Tests && ./$(TASTEFUL)
+	$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL).so
+	cd Tests && ./$(TASTEFUL).so
 	
 $(TESTS):
-	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@
+	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@.so
 	
 .PHONY: all, debug, test
 

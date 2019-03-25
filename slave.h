@@ -2,9 +2,8 @@
 #define _SLAVE_H_
 
 //librerías propias
-#include "queue.h"
-#include "slave.h"
-#include "utils.c"
+#include "utilities/queue.h"
+#include "utilities/utils.h"
 //librerías de C
 #include <stdio.h>
 #include <stddef.h>

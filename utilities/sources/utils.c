@@ -1,11 +1,9 @@
-#ifndef _UTILS_H_
-#define _UTILS_H_
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "../utils.h"
 //utils.c , comandos auxiliares que puede usar cualquier programa
 
 void call_command(char * command, char * buffer){
@@ -50,5 +48,3 @@ void call_command(char * command, char * buffer){
     close(fd[0]);
     return;
 }
-
-#endif

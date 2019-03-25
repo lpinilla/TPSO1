@@ -26,7 +26,9 @@
 int main(void){
     //primero, encontrar cuantos tests hay
     int n_of_suites_found = find_tests();
-    if(n_of_suites_found == 0) return 0;
+    if(n_of_suites_found == 0){
+        printf("No files found \n");
+    }
     //imprimir cartelito
      printf("----------------------------------------------\n");
     printf("\t Tasteful Framework \n");
@@ -43,9 +45,9 @@ int main(void){
 char ** fetch_all_suites(int n_of_suites_found){
     //simplemente agarrar la salida de grep
     char * buffer = (char *) malloc(MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
-    char ** ret = malloc(n_of_suites_found);
+    char ** ret = (char **) malloc(n_of_suites_found);
     memset(buffer, 0x0, MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
-    call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*(?!.)'", buffer);
+    call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*.so'", buffer);
     //cleaning buffer
     for(int i = 0; i < (MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char) - 1); i++){
         if(buffer[i] == '\n'){
@@ -81,7 +83,7 @@ char ** fetch_all_suites(int n_of_suites_found){
 
 int find_tests(){ //seguro se puede re optimizar a partir del comando anterior pero bueno
     char * buffer = (char *) malloc(sizeof(int));
-    call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*(?!.)' | wc -l", buffer);
+    call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*.so' | wc -l", buffer);
     int ret = atoi(buffer);
     free(buffer);
     return ret;
