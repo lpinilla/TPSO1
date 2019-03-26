@@ -5,11 +5,11 @@
 #arhivos que tienen un main
 TARGETS = slave
 #arhivos que no tienen un main
-SOURCES = utilities/sources/queue utilities/sources/utils
+SOURCES = utilities/sources/queue utilities/sources/utils slave_lib
 #testing
 TASTEFUL = tasteful
-TESTS = Tests/queueTest Tests/test1
-TEST_SOURCES = utilities/sources/queue Testing/testing_suite utilities/sources/utils
+TESTS = Tests/queueTest Tests/test1 Tests/slave_test
+TEST_SOURCES = utilities/sources/queue Testing/testing_suite utilities/sources/utils slave_lib
 
 CROSS_TOOL =
 CC_C = $(CROSS_TOOL) gcc
