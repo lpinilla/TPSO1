@@ -3,18 +3,18 @@
 #todos los archivos binarios van a tener extensión .so
 
 #arhivos que tienen un main
-TARGETS = slave view
+TARGETS = slave view application
 #arhivos que no tienen un main
-SOURCES = utilities/sources/queue utilities/sources/utils slave_lib
+SOURCES = utilities/sources/queue utilities/sources/utils slave_lib application_lib
 #testing
 TASTEFUL = tasteful
-TESTS = Tests/queueTest Tests/test1 Tests/slave_test
-TEST_SOURCES = utilities/sources/queue Testing/testing_suite utilities/sources/utils slave_lib
+TESTS = Tests/queueTest Tests/test1 Tests/slave_test Tests/application_test
+TEST_SOURCES = utilities/sources/queue Testing/testing_suite utilities/sources/utils slave_lib application_lib
 
 CROSS_TOOL =
 CC_C = $(CROSS_TOOL) gcc
 
-CFLAGS = -Wall -Werror -g -pthread 
+CFLAGS = -Wall -Werror -g -pthread
 
 all: clean $(TARGETS)
 
@@ -41,7 +41,7 @@ test: all $(TESTS) #correr todas las suites de test
 	cd Tests && ./$(TASTEFUL).so
 	
 $(TESTS):
-	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@.so
+	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@.so -lrt
 	
 .PHONY: all, debug, test
 
