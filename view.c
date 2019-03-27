@@ -34,31 +34,33 @@ int main(int argc,char **argv){
     //char *ptr_shm = mapping_shm(NULL,size_of shm,PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0); //no entiendo los parametros :(
     //sem_t *sem_adress= open_sem(SEM, O_CREAT, S_IRWXU, 0); //ver parametros
 
+    //shm_unlink(SHM);
+
+    //sem_post(SEM);
+
        
 }
 
 
 void print_hashes(char* hash_start,sem_t *sem){
-    int cant_hash_printed=0;
+    //NULL fin de hashes totales
+
     char* hash_ptr=hash_start;
     //esto es lo que dijo ariel de no hacer y yo lo estoy haciendo :)
-    while (1) {
+    while (hash_start!=NULL) {
 		if (sem_wait(sem)) {
 			printf("error\n");
 			printf("%s\n", strerror(errno));
 			exit(0);//error
 		}
 		print_hash(hash_ptr);
-		cant_hash_printed++;
-        //donde guardo cuantos hash tengo que imprimir?
-        // if(cant_hash_printed==cant_total){
-        //     break;
-        // }
-        hash_ptr+=32*sizeof(char);
+
+        hash_ptr+=sizeof(char*);
 	}
 }
 
 void print_hash(char *hash_ptr){
+    printf("%s\n",hash_ptr);
 
 }
 
