@@ -3,7 +3,7 @@
 #todos los archivos binarios van a tener extensión .so
 
 #arhivos que tienen un main
-TARGETS = slave
+TARGETS = slave view
 #arhivos que no tienen un main
 SOURCES = utilities/sources/queue utilities/sources/utils slave_lib
 #testing
@@ -14,12 +14,12 @@ TEST_SOURCES = utilities/sources/queue Testing/testing_suite utilities/sources/u
 CROSS_TOOL =
 CC_C = $(CROSS_TOOL) gcc
 
-CFLAGS = -Wall -Werror -g
+CFLAGS = -Wall -Werror -g -pthread 
 
 all: clean $(TARGETS)
 
 $(TARGETS):
-	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@.so
+	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@.so -lrt
 
 clean:
 	rm -f $(TARGETS) $(TARGETS:=.o) $(TARGETS:=.so)
