@@ -51,8 +51,9 @@ shm_info initialize_shared_memory(void ** shm_ptr, int n_of_files){
     return info;
 }
 
-void clear_shared_memory(void ** shm_ptr, int n_of_files, shm_info mem_info){    //aca esta el error 
+void clear_shared_memory(void ** shm_ptr, int n_of_files, shm_info mem_info){  
     sem_destroy(mem_info->semaphore);
+    free(mem_info->semaphore);
     for(int i = 0; i <= n_of_files; i++){
         free(*(shm_ptr + i * sizeof(void *)));
     }

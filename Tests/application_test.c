@@ -27,7 +27,7 @@ void shared_memory_test(){
     //creando memoria y escribiendola
     void ** mem_ptr = create_shared_memory((n_of_files + 1) * sizeof(void *));
     shm_info mem_info = initialize_shared_memory(mem_ptr, 0);
-    mem_ptr[1] = (char *) "hello world!222";  //el primer lugar esta reservado      
+    mem_ptr[1] = (char *) "hello world!";  //el primer lugar esta reservado      
     int fd[2] = {0,1};
     if( pipe(fd) < 0){
         perror("Error on pipe");
