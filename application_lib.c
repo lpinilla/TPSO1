@@ -42,12 +42,12 @@ void initialize_shared_memory(void ** shm_ptr, int n_of_files){
 }
 
 void clear_shared_memory(void ** shm_ptr, int n_of_files){
-    //munmap(shm_ptr, ((shm_info) shm_ptr[0])->mem_size);
     sem_destroy( &( (shm_info) shm_ptr[0])->semaphore);
     free(shm_ptr[0]);
     for(int i = 1; i < n_of_files; i++){
         free(shm_ptr[i]);
     }
+    munmap(shm_ptr, ((shm_info) shm_ptr[0])->mem_size);
     shm_unlink(SHM_NAME);
 }
 
