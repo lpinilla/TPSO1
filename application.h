@@ -26,8 +26,8 @@ typedef t_shm_info * shm_info;
 //crea una shared memory de tamaño size y conecta la memoria con el proceso
 void ** create_shared_memory(off_t size);
 
-//desvincularse de la memoria compartida
-void clear_shared_memory(void ** shm_ptr);
+//desvincularse de la memoria compartida y limpiar todos los punteros
+void clear_shared_memory(void ** shm_ptr, int n_of_files);
 
 /*función para inicializar el 1er bloque de la memoria compartida que es
 **un puntero de tipo shm_info */

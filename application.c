@@ -8,7 +8,6 @@ int main(){
     
     
     //desvincularse a la memoria y liberarla
-    clear_shared_memory(shm_ptr);
+    clear_shared_memory(shm_ptr, 0);
 }
-
 

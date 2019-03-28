@@ -44,7 +44,7 @@ void shared_memory_test(){
         close(fd[1]);
         
         if( munmap(ptr, 10 * sizeof(void *)) == -1){
-            clear_shared_memory(mem_ptr);
+            clear_shared_memory(mem_ptr, 0);
             perror("Error dettaching memory");
             exit(EXIT_FAILURE);
         }
@@ -55,7 +55,7 @@ void shared_memory_test(){
     //cerrar el fd y desvincular la memoria
     close(fd[0]);
     aux = (char *) mem_ptr[0];
-    clear_shared_memory(mem_ptr);
+    clear_shared_memory(mem_ptr, 0);
     //comparar lo que escribí con lo que leyó el hijo
     assert_equals(aux,result, sizeof(char *));
 }

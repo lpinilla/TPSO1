@@ -32,7 +32,17 @@ void print_hash(char *hash_ptr);
 
 
 
-int main(void){
+int main(int argc, char ** argv){
+
+	int app_pid = 0;
+
+	if(argc < 2){
+		printf("application's pid must be given");
+		exit(EXIT_FAILURE);
+	}else if(argc == 2){
+		app_pid = atoi(argv[1]); //pasar a int el pid del padre
+	}
+	printf("%d \n", app_pid); //para que deje compilar
 	//agarro puntero de donde arranca a shm
     int fd_shm = open_shm(SHM_NAME, O_RDONLY | O_CREAT, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
 
@@ -101,20 +111,4 @@ void **mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t 
     return ptr_shm;
 
 }
-
-//no usamos semaforo con nombre al final, asique no necesitamos esta funcion
-sem_t *open_sem(const char *name, int oflag, mode_t mode, unsigned int value){
-	sem_t *sem_adress = sem_open(name, oflag, mode, value);
-	if (sem_adress == SEM_FAILED) {
-		printf("Error\n");
-		printf("%s\n", strerror(errno));
-		exit(EXIT_FAILURE);//exit fail?
-	}
-	return sem_adress;
-}
-
-
-
-
-
 

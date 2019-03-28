@@ -38,7 +38,7 @@ debug: all #primero limpiar y compilar todo
 
 test: all $(TESTS) #correr todas las suites de test
 	@$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL).so
-	cd Tests && ./$(TASTEFUL).so
+	@cd Tests && ./$(TASTEFUL).so
 	
 $(TESTS):
 	@$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@.so -lrt
