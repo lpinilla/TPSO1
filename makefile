@@ -22,10 +22,10 @@ $(TARGETS):
 	$(CC_C) $(CFLAGS) $(SOURCES:=.c) $@.c -o $@.so -lrt
 
 clean:
-	rm -f $(TARGETS) $(TARGETS:=.o) $(TARGETS:=.so)
-	rm -f $(SOURCES) $(SOURCES:=.o)
-	rm -f $(TESTS) $(TESTS:=.o) $(TESTS:=.so)
-	rm -f $(TEST_SOURCES) $(TEST_SOURCES:=.o)
+	@rm -f $(TARGETS) $(TARGETS:=.o) $(TARGETS:=.so)
+	@rm -f $(SOURCES) $(SOURCES:=.o)
+	@rm -f $(TESTS) $(TESTS:=.o) $(TESTS:=.so)
+	@rm -f $(TEST_SOURCES) $(TEST_SOURCES:=.o)
 
 debug: all #primero limpiar y compilar todo
 	#checkeos cppcheck
@@ -37,11 +37,11 @@ debug: all #primero limpiar y compilar todo
 	$(foreach f, $(TARGETS:=).so, valgrind ./$f)
 
 test: all $(TESTS) #correr todas las suites de test
-	$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL).so
+	@$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL).so
 	cd Tests && ./$(TASTEFUL).so
 	
 $(TESTS):
-	$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@.so -lrt
+	@$(CC_C) $(CFLAGS) $(TEST_SOURCES:=.c) $@.c -o $@.so -lrt
 	
 .PHONY: all, debug, test
 

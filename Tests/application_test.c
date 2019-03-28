@@ -1,7 +1,6 @@
 #include "../Testing/testing_suite.h"
 #include "../application.h"
 #include "../utilities/utils.h"
-#include <fcntl.h>
 
 void shared_memory_test();
 void save_buffer_to_file_test();
