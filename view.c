@@ -25,10 +25,10 @@ int main(int argc, char ** argv){
 	//mapeo la memoria con su actual size
     void **ptr_shm = mapping_shm(NULL,aux->mem_size,PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,sizeof(void*));
     
-	print_hashes((char**) ptr_shm,&aux->semaphore,aux);
+	print_hashes((char**) ptr_shm,aux->semaphore,aux);
 
 	//munmap(ptr_shm, );
-    //shm_unlink(SHM);
+    shm_unlink(SHM_NAME);
 	return 0;
        
 }

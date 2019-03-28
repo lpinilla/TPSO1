@@ -17,10 +17,10 @@ int main(void){
 }
 
 void get_shm_info_test(){
-    int n_of_files = 10, cpid = 0, fds[2] = {0,1};
-    void ** shm_ptr = create_shared_memory(n_of_files * sizeof(void *));
+    int n_of_files = 0, cpid = 0, fds[2] = {0,1};
+    void ** shm_ptr = create_shared_memory((n_of_files + 1) * sizeof(void *));
     shm_info aux = NULL, aux2 = NULL;
-    initialize_shared_memory(shm_ptr, n_of_files);
+    shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
     aux2 = shm_ptr[0];
     if(pipe(fds) < 0){
         perror("pipe error");
@@ -39,6 +39,6 @@ void get_shm_info_test(){
         exit(EXIT_SUCCESS);
     }
     read(fds[0], &aux, sizeof(shm_info));
-    clear_shared_memory(shm_ptr, n_of_files);
+    clear_shared_memory(shm_ptr, n_of_files, mem_info);
     assert_equals(aux2, aux, sizeof(t_shm_info));
 }
