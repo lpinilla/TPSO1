@@ -5,11 +5,10 @@ int main(){
     printf("%d", getpid());
 
     void ** shm_ptr = create_shared_memory(10 * sizeof(void *));
-
-    shm_ptr[0] = NULL; //para que no compile con warning
     
     
-    //desvincularse a la memoria
-    unlink_shared_memory();
+    //desvincularse a la memoria y liberarla
+    clear_shared_memory(shm_ptr);
 }
+
 

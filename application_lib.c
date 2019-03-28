@@ -25,6 +25,31 @@ void ** create_shared_memory(off_t size){
     return shm_ptr;
 }
 
-void unlink_shared_memory(){
+void initialize_shared_memory(void ** shm_ptr, int n_of_files){
+    sem_t semaphore;
+    shm_info info = (shm_info) malloc(sizeof(t_shm_info));
+    if(info == NULL){
+        perror("Malloc error");
+        unlink(SHM_NAME);
+        exit(EXIT_FAILURE);
+    }
+    info->last_elem_ptr = shm_ptr + sizeof(void *);
+    info->semaphore = semaphore;
+    //inicializando el semáforo con valor 1
+    sem_init(&semaphore, 0, 1);
+    info->mem_size = (n_of_files + 1) * sizeof(void *);
+    shm_ptr[0] = info;
+}
+
+void clear_shared_memory(void ** shm_ptr){
+    free(shm_ptr[0]);
     shm_unlink(SHM_NAME);
+}
+
+void save_buffer_to_file(void ** shm_ptr, int n_of_files){
+    FILE * file = fopen("result.txt", "w+");
+    for(int i = 0; i < n_of_files;i++){
+        fprintf(file, "%s \n", (char *) shm_ptr[i+1]);
+    }
+    fclose(file);
 }
