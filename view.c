@@ -7,9 +7,7 @@
 #include <sys/stat.h> /* For mode constants */ 
 #include <semaphore.h>
 #include <unistd.h>
-#include "application.h" //ver si hace falta importar
-
-
+#include "application.h"
 
 
 //opens or creates an existing shared memory object.
@@ -28,7 +26,9 @@ void print_hashes(char** hash_start,sem_t *sem,shm_info str);
 
 void print_hash(char *hash_ptr);
 
-
+//función para guardar una referncia a la estructura en el primer puntero
+//de la memoria compartida
+shm_info get_shm_info(int fd_shm);
 
 
 
@@ -43,14 +43,12 @@ int main(int argc, char ** argv){
 		app_pid = atoi(argv[1]); //pasar a int el pid del padre
 	}
 	printf("%d \n", app_pid); //para que deje compilar
-	//agarro puntero de donde arranca a shm
-    int fd_shm = open_shm(SHM_NAME, O_RDONLY | O_CREAT, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
 
-	//agarro el primer void* de la shm, para saber el size total de la shm
-	void **first_struct=mapping_shm(NULL,sizeof(void*),PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0);
-	shm_info aux = (shm_info) first_struct[0];	//mapeo la memoria
-	munmap(first_struct,sizeof(void*)); //limpio memoria que ya no uso
+	//agarrar el file descriptor de la shared memory
+	int fd_shm = open_shm(SHM_NAME, O_RDONLY | O_CREAT, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
 
+	//agarrar el bloque inicial y guardarlo en una referencia
+	shm_info aux = get_shm_info(fd_shm);
 	printf("Mem size: %ld\n",aux->mem_size);
 
 	//mapeo la memoria con su actual size
@@ -58,11 +56,21 @@ int main(int argc, char ** argv){
     
 	print_hashes((char**) ptr_shm,&aux->semaphore,aux);
 
-
     //shm_unlink(SHM);
 	//sem_post(SEM);
 	return 0;
        
+}
+
+shm_info get_shm_info(int fd_shm){
+	shm_info ret = NULL;    
+	//agarro el primer void* de la shm, para tener una referencia a la estructura t_shm_info
+	void **first_struct= (void **) mapping_shm(NULL,sizeof(void*),PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0);
+	//guardo el puntero a la estructura
+	ret = (shm_info) first_struct[0]; 
+	//limpio memoria que ya no uso
+	munmap(first_struct,sizeof(void*)); 
+	return ret;
 }
 
 
@@ -101,7 +109,7 @@ int open_shm(const char *name, int oflag, mode_t mode){
 }
 
 void **mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t offset){
-    void **ptr_shm=mmap(NULL,length,prot,flags,fd,offset); //retorna pointer a la nueva map area
+    void **ptr_shm= (void **) mmap(NULL,length,prot,flags,fd,offset); //retorna pointer a la nueva map area
     if(ptr_shm == (void*)-1){
         printf("Error\n");
         printf("%s\n", strerror(errno));
@@ -109,6 +117,5 @@ void **mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t 
 
     }
     return ptr_shm;
-
 }
 
