@@ -7,6 +7,8 @@
 #include <sys/stat.h> /* For mode constants */ 
 #include <semaphore.h>
 #include <unistd.h>
+#include "application.h" //ver si hace falta importar
+
 
 
 
@@ -16,47 +18,60 @@ int open_shm(const char *name, int oflag, mode_t mode);
 
 //creates a new mapping in the virtual address space of the calling process
 //returns a pointer to the mapped area
-void *new_mapping(void *addr, size_t length, int prot, int flags,int fd, off_t offset);
+void **mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t offset);
 
 //creates a new semaphore or opens an existin semaphore
 //returns the address of the new or existing semaphore
 sem_t *open_sem(const char *name, int oflag, mode_t mode, unsigned int value);
 
-void print_hashes(char* hash_start,sem_t *sem);
+void print_hashes(char** hash_start,sem_t *sem,shm_info str);
+
 void print_hash(char *hash_ptr);
 
 
 
 
 
-int main(int argc,char **argv){
-    //int fd_shm = open_shm(SHM, O_RDONLY | O_CREAT, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
-    //char *ptr_shm = mapping_shm(NULL,size_of shm,PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0); //no entiendo los parametros :(
-    //sem_t *sem_adress= open_sem(SEM, O_CREAT, S_IRWXU, 0); //ver parametros
+int main(void){
+	//agarro puntero de donde arranca a shm
+    int fd_shm = open_shm(SHM_NAME, O_RDONLY | O_CREAT, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
+
+	//agarro el primer void* de la shm, para saber el size total de la shm
+	void **first_struct=mapping_shm(NULL,sizeof(void*),PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0);
+	shm_info aux = (shm_info) first_struct[0];	//mapeo la memoria
+	munmap(first_struct,sizeof(void*)); //limpio memoria que ya no uso
+
+	printf("Mem size: %ld\n",aux->mem_size);
+
+	//mapeo la memoria con su actual size
+    void **ptr_shm = mapping_shm(NULL,aux->mem_size,PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,sizeof(void*));
+    
+	print_hashes((char**) ptr_shm,&aux->semaphore,aux);
+
 
     //shm_unlink(SHM);
-
-    //sem_post(SEM);
-
+	//sem_post(SEM);
+	return 0;
        
 }
 
 
-void print_hashes(char* hash_start,sem_t *sem){
-    //NULL fin de hashes totales
+void print_hashes(char** hash_start,sem_t *sem,shm_info aux){
+    char** hash_ptr=hash_start;
 
-    char* hash_ptr=hash_start;
-    //esto es lo que dijo ariel de no hacer y yo lo estoy haciendo :)
-    while (hash_start!=NULL) {
+    //esto consultar con Ariel:)
+	int cant_files=((aux->mem_size)/sizeof(void*))-1;
+    for(int i=0;i<cant_files;i++){
 		if (sem_wait(sem)) {
 			printf("error\n");
 			printf("%s\n", strerror(errno));
-			exit(0);//error
+			exit(EXIT_FAILURE);//error
 		}
-		print_hash(hash_ptr);
-
-        hash_ptr+=sizeof(char*);
+		print_hash(hash_ptr[i]);
+		sem_post(sem);
+        hash_ptr+=sizeof(void*);
 	}
+	
 }
 
 void print_hash(char *hash_ptr){
@@ -66,32 +81,34 @@ void print_hash(char *hash_ptr){
 
 int open_shm(const char *name, int oflag, mode_t mode){
     int fd_shm = shm_open(name, oflag, mode); 
+	
 	if (fd_shm == -1) {
 		printf("Error\n");
 		printf("%s\n", strerror(errno));
-		exit(0); //exit fail?
+		exit(EXIT_FAILURE); //exit fail?
 	}
 	return fd_shm;
 }
 
-void *mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t offset){
-    void *ptr_shm=mmap(NULL,length,prot,flags,fd,offset); //retorna pointer a la nueva map area
+void **mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t offset){
+    void **ptr_shm=mmap(NULL,length,prot,flags,fd,offset); //retorna pointer a la nueva map area
     if(ptr_shm == (void*)-1){
         printf("Error\n");
         printf("%s\n", strerror(errno));
-		exit(0); //exit fail?
+		exit(EXIT_FAILURE); //exit fail?
 
     }
     return ptr_shm;
 
 }
 
+//no usamos semaforo con nombre al final, asique no necesitamos esta funcion
 sem_t *open_sem(const char *name, int oflag, mode_t mode, unsigned int value){
 	sem_t *sem_adress = sem_open(name, oflag, mode, value);
 	if (sem_adress == SEM_FAILED) {
 		printf("Error\n");
 		printf("%s\n", strerror(errno));
-		exit(0);//exit fail?
+		exit(EXIT_FAILURE);//exit fail?
 	}
 	return sem_adress;
 }
