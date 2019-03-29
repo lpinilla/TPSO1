@@ -3,13 +3,11 @@
 #include "../view.h"
 
 void get_shm_info_test();
-void arguments_check_test();
 
 int main(void){
     create_suite("Testing the View");
 
     add_test(get_shm_info_test);
-    add_test(arguments_check_test);
 
     run_suite();
     
@@ -43,10 +41,4 @@ void get_shm_info_test(){
     read(fds[0], &aux, sizeof(shm_info));
     clear_shared_memory(shm_ptr, n_of_files, mem_info);
     assert_equals(aux2, aux, sizeof(t_shm_info));
-}
-
-void arguments_check_test(){
-    int argc = 2;
-    char * const argv = {"../view.so", "1234"};
-    check_arguments(argc, argv);
 }
