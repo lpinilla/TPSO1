@@ -4,7 +4,7 @@ void ** create_shared_memory(off_t size){
     void ** shm_ptr = NULL;
     //crear la memoria compartida
     int shmid = 0;
-    shmid = shm_open(SHM_NAME, O_RDWR | O_CREAT, 0660); //hacer un define con la constante 0660
+    shmid = shm_open(SHM_NAME, O_RDWR | O_CREAT, S_IRWXU);
     if(shmid < 0){
         perror("smh_open");
         exit(EXIT_FAILURE);

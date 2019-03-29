@@ -17,6 +17,7 @@
 #define SHM_NAME "/shm"
 
 typedef struct{
+    //puntero al último elemento agregado
     char ** last_elem_ptr;
     sem_t * semaphore;
     off_t mem_size;

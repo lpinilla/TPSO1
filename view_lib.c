@@ -13,8 +13,8 @@ shm_info get_shm_info(int fd_shm){
 
 
 void print_hashes(char** hash_start, shm_info mem_info){
+	printf("asdaaaaaaaaaaaaa \n");
     char** hash_ptr=hash_start;
-
     //esto consultar con Ariel:)
 	int cant_files=((mem_info->mem_size)/sizeof(void*))-1;
     for(int i=0;i<cant_files;i++){
@@ -24,7 +24,11 @@ void print_hashes(char** hash_start, shm_info mem_info){
 			exit(EXIT_FAILURE);//error
 		}
 		print_hash(hash_ptr[i]);
-		sem_post(mem_info->semaphore);
+		if( sem_post(mem_info->semaphore)){
+			printf("error\n");
+			printf("%s\n", strerror(errno));
+			exit(EXIT_FAILURE);//error
+		}
         hash_ptr+=sizeof(void*);
 	}
 	
@@ -60,11 +64,11 @@ void **mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t 
 void ** connect_to_shm(shm_info * mem_info){
 	//agarrar el file descriptor de la shared memory
 	int fd_shm = open_shm(SHM_NAME, O_RDONLY | O_CREAT, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
-
 	//agarrar el bloque inicial y guardarlo en una referencia
 	*mem_info = get_shm_info(fd_shm);
-	printf("Mem size: %ld\n",(*mem_info)->mem_size);
-
+	printf("%p \n", *mem_info);	
+	printf("Mem size: %ld\n", (*mem_info)->mem_size);
+	printf("imprimimos \n");
 	//mapeo la memoria con su actual size
     void **ptr_shm = mapping_shm(NULL,(*mem_info)->mem_size,PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,sizeof(void*));
 	return ptr_shm;
@@ -80,8 +84,8 @@ void check_arguments(int argc, char ** argv){
 	if(argc < 2){
 		printf("application's pid must be given");
 		exit(EXIT_FAILURE);
-	}else if(argc == 2){
+	}else{
 		app_pid = atoi(argv[1]); //pasar a int el pid del padre
 	}
-	printf("%d \n", app_pid); //para que deje compilar
+	printf("app pid's %d \n", app_pid); //para que deje compilar
 }
