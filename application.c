@@ -17,6 +17,12 @@ int main(){
     for(int i=0; i<NUMBER_OF_SLAVES; i++){
         pipe(pipes[i]);
     }
+    for(int i=0; i<NUMBER_OF_SLAVES; i++){
+        if(fork()==0){
+            // para testear usamos esto desp vemos el nombre 
+            execv("./slave.out", "");
+        }
+    }
     
     //desvincularse a la memoria y liberarla
     clear_shared_memory(shm_ptr, n_of_files, mem_info);
