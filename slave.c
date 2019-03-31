@@ -10,11 +10,11 @@ int main(void){
 	char rt[100];
 	while(1){
 		read_file_names(files);
-		dequeue(files,&filename);
-		if(*filename == EOF)
-			break;
-		call_md5(filename,rt);
-		printf("%s",rt);
+		while(getQueueSize(files)>0){
+			dequeue(files,&filename);
+			call_md5(filename,rt);
+			printf("%s",rt);
+		}
 	}
 	//al finalizar hay que liberar la cola
 	freeQueue(files);

@@ -18,7 +18,6 @@ void call_md5(char * file_name, char * output){
 	full_command[0] = '\0';
 	strcat(full_command, command_name);
 	strcat(full_command, file_name);
-	printf("%s", full_command);
 	call_command(full_command, output);
 	return;
 }
