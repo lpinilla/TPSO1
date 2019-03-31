@@ -2,6 +2,17 @@
 
 //extraído de https://codereview.stackexchange.com/questions/141238/implementing-a-generic-queue-in-c
 
+
+Queue * newQueue(){
+    Queue * q = malloc(sizeof(*q));
+    return q;
+}
+
+void freeQueue(Queue * q){
+    clearQueue(q);
+    free(q);
+}
+
 void queueInit(Queue *q, size_t memSize)
 {
    q->sizeOfQueue = 0;

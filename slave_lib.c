@@ -3,12 +3,15 @@
 
 //leer los nombres de los archivos de stdin
 void read_file_names(Queue * q){
-	char * line = NULL;
+	char * line;
 	ssize_t linecap = 0;
-	size_t linelen;
-	while( (linelen = getline(&line, (size_t *) &linecap, stdin)) > 0){ 
-		enqueue(q, &line);
-	}
+	size_t linelen = 0;
+	/*
+	linelen = getline(&line, (size_t *) &linecap, stdin);
+	line[linelen] = '\0';
+	printf("%s", line);
+	enqueue(q, line);
+	*/
 }
 
 void call_md5(char * file_name, char * output){
