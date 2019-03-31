@@ -12,6 +12,8 @@ int main(void){
 		read_file_names(files);
 		while(getQueueSize(files)>0){
 			dequeue(files,&filename);
+			if(!strcmp(filename,"-1"))
+				exit(1);
 			call_md5(filename,rt);
 			printf("%s",rt);
 		}
