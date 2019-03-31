@@ -19,6 +19,8 @@ void call_md5(char * file_name, char * output){
 		strcpy(output, "Invalid file sintax \n");
 		return;
 	}
+	// REDIRECCIONAMOS STDERR A STDOUT PARA TENER LOS ERRORES
+	// DE md5sum
 	char command_name[] = "md5sum 2>&1 ";
 	int size = strlen(command_name) + strlen(file_name);
 	char full_command[size+1];
