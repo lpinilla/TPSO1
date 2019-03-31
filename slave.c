@@ -8,10 +8,14 @@ int main(void){
 	queueInit(files, sizeof(char *));
 	char * filename;
 	char rt[100];
-	read_file_names(files);
-	dequeue(files,&filename);
-	call_md5(filename,rt);
-	printf("%s",rt);
+	while(1){
+		read_file_names(files);
+		dequeue(files,&filename);
+		if(*filename == EOF)
+			break;
+		call_md5(filename,rt);
+		printf("%s",rt);
+	}
 	//al finalizar hay que liberar la cola
 	freeQueue(files);
 }
