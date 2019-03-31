@@ -3,7 +3,7 @@
 #include "utilities/queue.h"
 
 int main(void){
-	//Una cola de los nombres de archivos y otra para los hashes
+	//Una cola de los nombres de archivos
 	Queue * files = newQueue();
 	queueInit(files, sizeof(char *));
 	char * filename;
@@ -12,11 +12,16 @@ int main(void){
 		read_file_names(files);
 		while(getQueueSize(files)>0){
 			dequeue(files,&filename);
-			if(!strcmp(filename,"-1"))
+			if(!strcmp(filename,"-1")){
+				freeQueue(files);
 				exit(1);
+			}
 			call_md5(filename,rt);
 			printf("%s",rt);
 		}
+		// si llegamos aca es que no nos dieron senial
+		// de finalizado y pedimos al padre mas archivos
+		printf("-1\n");
 	}
 	//al finalizar hay que liberar la cola
 	freeQueue(files);
