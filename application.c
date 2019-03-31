@@ -1,5 +1,6 @@
 #include "application.h"
 
+#define NUMBER_OF_SLAVES 5
 
 int main(){
     //imprimir el pid para vision
@@ -9,6 +10,13 @@ int main(){
     shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
     
     printf("%p \n", mem_info); //para que me deje compilar
+
+
+    int pipes[NUMBER_OF_SLAVES][2];
+    // abrimos todos los pipes
+    for(int i=0; i<NUMBER_OF_SLAVES; i++){
+        pipe(pipes[i]);
+    }
     
     //desvincularse a la memoria y liberarla
     clear_shared_memory(shm_ptr, n_of_files, mem_info);
