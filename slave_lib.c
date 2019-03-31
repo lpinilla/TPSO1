@@ -21,8 +21,3 @@ void call_md5(char * file_name, char * output){
 	call_command(full_command, output);
 	return;
 }
-
-void ask_for_more_files(Queue * q){
-	//avisarle al padre
-	//read_file_names(q);
-}

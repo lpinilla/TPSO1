@@ -14,11 +14,13 @@ void call_command(char * command, char * buffer){
     fd = popen(command, "r");
     int i = 0;
     int c;
-    while ( (c=getc(fd)) != '\n' ){
+    while ( (c=getc(fd)) != '\n' && c!=EOF ){
         buffer[i] = c;
         i++;
     }
-    buffer[i++] = '\n';
+    if(c==EOF){
+        buffer[i++]=='\n';
+    }
     buffer[i] = '\0';
     pclose(fd);
     return;

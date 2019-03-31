@@ -7,7 +7,7 @@ int main(void){
 	Queue * files = newQueue();
 	queueInit(files, sizeof(char *));
 	char * filename;
-	char rt[100];
+	char * rt = calloc(sizeof(char)*100,0);
 	while(1){
 		read_file_names(files);
 		while(getQueueSize(files)>0){
@@ -23,6 +23,4 @@ int main(void){
 		// de finalizado y pedimos al padre mas archivos
 		printf("-1\n");
 	}
-	//al finalizar hay que liberar la cola
-	freeQueue(files);
 }
