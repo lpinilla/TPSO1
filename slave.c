@@ -7,7 +7,7 @@ int main(void){
 	Queue files;
 	queueInit(&files, (size_t)sizeof(char *));
 	char rt[100];
-	call_command("md5sum slave.c",rt);
+	call_md5("slave.c",rt);
 	printf("%s", rt);
 	//al finalizar hay que liberar la cola
 	clearQueue(&files);
