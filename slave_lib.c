@@ -12,7 +12,7 @@ void read_file_names(Queue q){
 }
 
 void call_md5(char * file_name, char * output){
-	char * command_name = "md5sum ";
+	static char command_name[] = "md5sum ";
 	//combinar para que sea "md5sum file_name"
 	char * full_command = (char *) malloc((strlen(command_name) + strlen(file_name) + 1) * sizeof(char));  //malloc puede fallar
 	if(full_command == NULL){
