@@ -1,13 +1,14 @@
 #include "slave.h"
 #include "utilities/utils.h"
+#include "utilities/queue.h"
 
 int main(void){
 	//Una cola de los nombres de archivos y otra para los hashes
-	Queue file_names;
-	queueInit(&file_names, sizeof(char *));
-	//read_file_names(file_names);
-
-
+	Queue files;
+	queueInit(&files, (size_t)sizeof(char *));
+	char rt[100];
+	call_command("md5sum slave.c",rt);
+	printf("%s", rt);
 	//al finalizar hay que liberar la cola
-	clearQueue(&file_names);
+	clearQueue(&files);
 }
