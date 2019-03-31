@@ -21,12 +21,17 @@ int main(){
     for(int i=0; i<NUMBER_OF_SLAVES; i++){
         if(fork()==0){
             // el hijo cierra su stdin
-            close(stdin);
+            close(0);
             // lo redireccionamos al pipe correspondiente
             dup(pipes[i][0]);
             // para testear usamos esto desp vemos el nombre 
             execv("./slave.out", NULL);
         }
+    }
+    // el padre les escribe los archivos
+    for(int i=0; i<NUMBER_OF_SLAVES; i++){
+        write(pipes[i][1], "slave.c\n",8);
+        write(pipes[i][1], "slave.h\n",8);
     }
 
     //desvincularse a la memoria y liberarla
