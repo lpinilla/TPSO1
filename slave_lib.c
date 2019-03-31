@@ -8,16 +8,17 @@ void read_file_names(Queue * q){
 	size_t linelen = 0;
 	linelen = getline(&line, (size_t *) &linecap, stdin);
 	line[linelen-1] = '\0';
-	printf("%s", line);
 	enqueue(q, &line);
 }
 
 void call_md5(char * file_name, char * output){
-	static char command_name[] = "md5sum ";
+	char command_name[] = "md5sum ";
 	int size = strlen(command_name) + strlen(file_name);
-	char full_command[size];
+	char full_command[size+1];
+	full_command[0] = '\0';
 	strcat(full_command, command_name);
 	strcat(full_command, file_name);
+	printf("%s", full_command);
 	call_command(full_command, output);
 	return;
 }

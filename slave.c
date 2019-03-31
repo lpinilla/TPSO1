@@ -7,10 +7,11 @@ int main(void){
 	Queue * files = newQueue();
 	queueInit(files, sizeof(char *));
 	char * filename;
+	char rt[100];
 	read_file_names(files);
 	dequeue(files,&filename);
-	printf("\n %s",filename);
-	//call_md5("a.out",rt);
+	call_md5(filename,rt);
+	printf("%s",rt);
 	//al finalizar hay que liberar la cola
 	freeQueue(files);
 }
