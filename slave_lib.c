@@ -12,6 +12,18 @@ void read_file_names(Queue * q){
 }
 
 void call_md5(char * file_name, char * output){
+	// esto lo hago para ignorar los casos de md5sum que entran a leer
+	// stdin sin parar
+	char c = file_name[0];
+	if(c=='-' || c=='\0' || c=='\n' || c==' ' || c=='\t' || c==EOF){
+		strcpy(output, "Invalid file sintax \n");
+		return;
+	}
+	if(access(file_name, R_OK) == -1){	
+		output = strcpy(output, file_name);	
+		output = strcpy(output, ": file doesnt exist \n");
+		return;
+	}
 	char command_name[] = "md5sum ";
 	int size = strlen(command_name) + strlen(file_name);
 	char full_command[size+1];

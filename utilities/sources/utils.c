@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "../utils.h"
+#include <string.h>
 //utils.c , comandos auxiliares que puede usar cualquier programa
 
 void call_command(char * command, char * buffer){
@@ -13,15 +14,13 @@ void call_command(char * command, char * buffer){
     FILE * fd;
     fd = popen(command, "r");
     int i = 0;
-    int c;
+    int c = getc(fd);
     while ( (c=getc(fd)) != '\n' && c!=EOF ){
         buffer[i] = c;
         i++;
     }
-    if(c==EOF){
-        buffer[i++]=='\n';
-    }
-    buffer[i] = '\0';
+    buffer[i] = '\n';
+    buffer[++i] = '\0';
     pclose(fd);
     return;
 }

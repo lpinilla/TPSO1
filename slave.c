@@ -7,7 +7,7 @@ int main(void){
 	Queue * files = newQueue();
 	queueInit(files, sizeof(char *));
 	char * filename;
-	char * rt = calloc(sizeof(char)*100,0);
+	char rt[100];
 	while(1){
 		read_file_names(files);
 		while(getQueueSize(files)>0){
