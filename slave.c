@@ -4,10 +4,14 @@
 
 int main(void){
 	//Una cola de los nombres de archivos y otra para los hashes
-	Queue files;
-	queueInit(&files, (size_t)sizeof(char *));
+	Queue * files;
+	queueInit(files, (size_t)sizeof(char *));
 	char rt[100];
-	call_md5("slave.c",rt);
+	char filename[100];
+	read_file_names(files);
+	dequeue(files,(void *)filename);
+	printf("%s\n",filename);
+	call_md5(filename,rt);
 	printf("%s", rt);
 	//al finalizar hay que liberar la cola
 	clearQueue(&files);

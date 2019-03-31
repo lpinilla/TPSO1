@@ -1,6 +1,7 @@
 ## binarios de programa principal
 
 *.so
+*.out
 
 
 ## binarios de test
