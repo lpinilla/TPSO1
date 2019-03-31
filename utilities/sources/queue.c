@@ -4,7 +4,7 @@
 
 
 Queue * newQueue(){
-    Queue * q = malloc(sizeof(*q));
+    Queue * q = calloc(sizeof(*q),0);
     return q;
 }
 
@@ -15,9 +15,7 @@ void freeQueue(Queue * q){
 
 void queueInit(Queue *q, size_t memSize)
 {
-   q->sizeOfQueue = 0;
    q->memSize = memSize;
-   q->head = q->tail = NULL;
 }
 
 int enqueue(Queue *q, const void *data)

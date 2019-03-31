@@ -5,16 +5,12 @@
 int main(void){
 	//Una cola de los nombres de archivos y otra para los hashes
 	Queue * files = newQueue();
-	queueInit(files, (size_t)sizeof(char *));
-	char rt[100];
-	char filename[100];
+	queueInit(files, sizeof(char *));
+	char * filename;
 	read_file_names(files);
-	dequeue(files,(void *)filename);
-	printf("%s\n",filename);
-	/*
-	call_md5(filename,rt);
-	printf("%s", rt);
-	*/
+	dequeue(files,&filename);
+	printf("\n %s",filename);
+	//call_md5("a.out",rt);
 	//al finalizar hay que liberar la cola
 	freeQueue(files);
 }
