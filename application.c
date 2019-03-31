@@ -11,14 +11,19 @@ int main(){
     
     printf("%p \n", mem_info); //para que me deje compilar
 
-
+    // creamos los pipes de ida
     int pipes[NUMBER_OF_SLAVES][2];
-    // abrimos todos los pipes
+    // abrimos todos los pipes de ida
     for(int i=0; i<NUMBER_OF_SLAVES; i++){
         pipe(pipes[i]);
     }
+    // el padre de por si cierra su stdout
     for(int i=0; i<NUMBER_OF_SLAVES; i++){
         if(fork()==0){
+            // el hijo cierra su stdin
+            close(stdin);
+            // lo redireccionamos al pipe correspondiente
+            dup(pipes[i][0]);
             // para testear usamos esto desp vemos el nombre 
             execv("./slave.out", NULL);
         }
