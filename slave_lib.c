@@ -19,12 +19,7 @@ void call_md5(char * file_name, char * output){
 		strcpy(output, "Invalid file sintax \n");
 		return;
 	}
-	if(access(file_name, R_OK) == -1){	
-		output = strcpy(output, file_name);	
-		output = strcpy(output, ": file doesnt exist \n");
-		return;
-	}
-	char command_name[] = "md5sum ";
+	char command_name[] = "md5sum 2>&1 ";
 	int size = strlen(command_name) + strlen(file_name);
 	char full_command[size+1];
 	full_command[0] = '\0';
