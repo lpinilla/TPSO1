@@ -15,7 +15,9 @@ void freeQueue(Queue * q){
 
 void queueInit(Queue *q, size_t memSize)
 {
-   q->memSize = memSize;
+    q->head = q->tail = NULL;
+    q->sizeOfQueue = 0;
+    q->memSize = memSize;
 }
 
 int enqueue(Queue *q, const void *data)
