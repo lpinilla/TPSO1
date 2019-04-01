@@ -1,4 +1,5 @@
 #include "testing_suite.h"
+#include <signal.h>
 
 
 void create_suite(char * suite_name){
@@ -40,6 +41,9 @@ void run_suite(){
             exit(EXIT_FAILURE);
         }else if(cpid[i] == 0){ //proceso hijo, el test
             suite->fun_ptrs[i]();
+            if(errno != 0){
+                fprintf(stderr, "Error %d %s \n", errno, strerror(errno));
+            }
             exit(EXIT_SUCCESS);
         }
     }
@@ -59,12 +63,32 @@ void run_suite(){
                 suite->suite_state = FAILURE;
                 printf("\033[0;31m");
                 printf("%d: %s \n",i, "FAIL");
+                printf("-- return code: %d \n", WEXITSTATUS(child_status));
+                //print_trace();
                 printf("\033[0m");
             }
-        }else{ //el proceso no terminó
+        }else if(WIFSIGNALED(child_status)){ //terminó por una señal            
             suite->suite_state = FAILURE;
             printf("\033[0;31m");
             printf("%d: %s \n",i, "FAIL");
+            printf("Killed by signal %d \n", WTERMSIG(child_status));    
+            printf("-- return code: %d \n", WEXITSTATUS(child_status));
+            //print_trace();
+            printf("\033[0m");
+        }else if(WIFSTOPPED(child_status)){
+            suite->suite_state = FAILURE;
+            printf("\033[0;31m");
+            printf("%d: %s ",i, "FAIL");
+            printf("-- Killed by signal %d \n", WTERMSIG(child_status));    
+            printf("-- return code: %d \n", WEXITSTATUS(child_status));
+            //print_trace();
+            printf("\033[0m");
+        }else{ //el proceso no terminó
+            suite->suite_state = FAILURE;
+            printf("\033[0;31m");
+            printf("%d: %s \n",i, "FAIL");            
+            printf("-- return code: %d \n", WEXITSTATUS(child_status));
+            //print_trace();
             printf("\033[0m");
         }
     }
@@ -116,4 +140,38 @@ inline void assert_true(int i){ //podría ser una macro
 
 inline void assert_false(int i){ //podría ser una macro
     i? exit(EXIT_FAILURE) : exit(EXIT_SUCCESS);
+}
+
+//https://stackoverflow.com/questions/9555837/how-to-know-caller-function-when-tracing-assertion-failure
+void print_trace(void){
+    void * array[10];
+    size_t size, i;
+    char ** strings;
+    size = backtrace(array, 10);
+    strings = backtrace_symbols(array, size);
+    printf ("Obtained %zd stack frames.\n", size);
+    for (i = 0; i < size; i++){
+        printf("\t %s \n", strings[i]);
+    }
+    free (strings);
+}
+
+void check_child_status(int status){
+    if (WIFEXITED(status)) {
+        printf("exited, status=%d\n", WEXITSTATUS(status));
+    } else if (WIFSIGNALED(status)) {
+        printf("killed by signal %d", WTERMSIG(status));
+        switch(WTERMSIG(status)){
+            case SIGSEGV:
+                printf("\t ++Segmentation fault \n");
+                break;
+            case SIGABRT:
+                printf("\t ++Abort \n");
+                break;
+        }
+    } else if (WIFSTOPPED(status)) {
+        printf("stopped by signal %d\n", WSTOPSIG(status));
+    } else if (WIFCONTINUED(status)) {
+        printf("continued\n");
+    }
 }

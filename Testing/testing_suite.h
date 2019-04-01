@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <errno.h>
+#include <execinfo.h>
+#include "tasteful.h"
 
 #define ARRAY_STEP 5
 
@@ -53,6 +56,12 @@ void add_test(void (* fun) ());
 
 //función que se encarga de hacer todos los free
 void clear_suite();
+
+//imprimir las últimadas llamadas al stack
+void print_trace();
+
+//verificar el estado del proceso hijo
+void check_child_status(int status);
 
 //puntero global para que sea más cómodo operar con la estructura
 test_suite suite;
