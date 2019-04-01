@@ -19,8 +19,8 @@
 
 
 typedef struct{
-    //puntero al último elemento agregado
-    char * last_elem_ptr;
+    //offset al último elemento agregado
+    size_t offset;
     sem_t semaphore;
     off_t mem_size;
 }t_shm_info;

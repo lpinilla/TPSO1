@@ -67,8 +67,7 @@ void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){
         mem_info->last_elem_ptr += HASH_NAME_SIZE; //cambiar a tamaño posta
     }
     //escribir
-    strcpy(mem_info->last_elem_ptr, hash);
-    
+    mem_info->last_elem_ptr = strcpy(mem_info->last_elem_ptr, hash);
     if( sem_post(&mem_info->semaphore) < 0){
         perror("Error in wait");
         exit(EXIT_FAILURE);

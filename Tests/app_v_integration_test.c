@@ -25,8 +25,7 @@ void app_vision_integration_test(){
     printf("%d \n", getpid());
     int n_of_files = 1, cpid = 0, mypid = getpid(), child_status = 0;
     void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
-    shm_info mem_info = initialize_shared_memory( shm_ptr, n_of_files);
-
+    shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
     //agarramos un hash llamando a md5sum
     char * buff = (char *) malloc(256 * sizeof(char));
     if(buff == NULL){
@@ -35,9 +34,7 @@ void app_vision_integration_test(){
     }
     memset(buff, 0, 256 * sizeof(char)); //limpiar todo el buffer
     call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
-
     write_hash_to_shm(shm_ptr, mem_info, buff);
-    
     //imprimir hash desde la view
     cpid = fork();
     if(cpid < 0){

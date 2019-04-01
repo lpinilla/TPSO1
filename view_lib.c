@@ -51,10 +51,16 @@ void * mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t 
 
 void * connect_to_shm(shm_info * mem_info, off_t size){
 	//agarrar el file descriptor de la shared memory
-	int fd_shm = open_shm(SHM_NAME, O_RDWR | O_CREAT, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
+	int fd_shm = open_shm(SHM_NAME, O_RDWR, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
 	//mapeo la memoria con su actual size
     void * ptr_shm = mapping_shm(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0);
-	*mem_info = (shm_info) ptr_shm;
+	*mem_info = (shm_info) ptr_shm;	
+	// printf("check1: %p \n", ptr_shm);
+	// printf("check2: %p \n", *mem_info);
+	printf("fetching string %s \n", (char *) ptr_shm + sizeof(t_shm_info));
+	printf("original %p \n", (char *) ptr_shm + sizeof(t_shm_info));
+	printf("mem_info %p \n", (*mem_info)->last_elem_ptr);
+	printf("fetching string correctly %s \n", (*mem_info)->last_elem_ptr);
 	return ptr_shm;
 }
 
