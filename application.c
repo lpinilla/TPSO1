@@ -40,7 +40,8 @@ int main(int argc, char ** argv){
             // lo redireccionamos al pipe correspondiente
             dup(pipes[i][0]);
             // para testear usamos esto desp vemos el nombre 
-            execv("./slave.out","");
+            char ** argv = NULL;
+            execv("./slave.so", argv);
         }
     }
     // el padre les escribe los archivos
