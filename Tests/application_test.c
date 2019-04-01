@@ -11,9 +11,9 @@ int main(void){
     create_suite("Testing the Application");
 
     //add_test(shared_memory_test);
-    //add_test(save_buffer_to_file_test);
+    add_test(save_buffer_to_file_test);
     add_test(write_hash_to_shm_test);
-    //add_test(write_and_read_hash_to_shm_test);
+    add_test(write_and_read_hash_to_shm_test);
 
     run_suite();
     
@@ -70,20 +70,19 @@ void shared_memory_test(){ //free(): invalid pointer en algún lado
 }
 
 void save_buffer_to_file_test(){
-    void ** strings = (void ** )malloc(sizeof(void *) * 3);
-    int ret = 0;
-    char cmd_ret = 0;
-    char buff[256];
-    strings[0] = "";
-    strings[1] = "hello";
-    strings[2] = "world!";
-    int n_of_files = 2;
+    int n_of_files = 2, ret = 0;
+    void * strings = (void *) malloc(2 * HASH_LENGTH);
+    char cmd_ret = 0, buff[HASH_LENGTH * 2];
+    memset(strings, 0, 2 * HASH_LENGTH);
+    strcpy(strings, "hello");
+    strcpy(strings + HASH_LENGTH, "world!");
     save_buffer_to_file(strings, n_of_files);
+    //leer del archivo
     FILE * file = fopen("result.txt", "r+");
     fscanf(file, "%s", buff);
-    fscanf(file, "%s", buff + 6);
-    ret = strcmp(buff, strings[1]);
-    ret += strcmp(buff + 6, strings[2]);
+    fscanf(file, "%s", buff + HASH_LENGTH);
+    ret = strncmp(buff, strings, HASH_LENGTH);
+    ret += strcmp(buff + HASH_LENGTH, strings + HASH_LENGTH);
     //liberar memoria
     free(strings);
     //borrar archivo
