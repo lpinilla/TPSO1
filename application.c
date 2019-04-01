@@ -18,7 +18,7 @@ int main(int argc, char ** argv){
     Queue * files = newQueue();
     queueInit(files, sizeof(char*));
     for(int i=1; i<argc; i++){
-        char * filename = malloc(sizeof(char*)*strlen(argv[i]));
+        char * filename = malloc(sizeof(char)*strlen(argv[i]));
         strcpy(filename,argv[i]);
         // la inicializamos por cada argumento
         stat(filename, &path_stat);
@@ -26,22 +26,27 @@ int main(int argc, char ** argv){
         if(S_ISREG(path_stat.st_mode)){
             // si es una file es facil, la encolamos
             enqueue(files ,&filename);
-            printf("ERA UNA FILE \n");
         }
         // usamos otra macro para ver si es un directorio
         else if(S_ISDIR(path_stat.st_mode)){
             // si es un dir vemos todas las files adentro
             DIR * dir;
             struct dirent * ent;
-            dir = opendir(argv[i]);
+            dir = opendir(filename);
             while((ent = readdir(dir)) != NULL){
-                struct stat path_stat_inside;
-                stat(ent->d_name,&path_stat_inside);
-                if(S_ISREG(path_stat_inside.st_mode))
-                    enqueue(files, &(ent->d_name));
+                char * name = malloc(sizeof(char)*strlen(ent->d_name)
+                +sizeof(char)*strlen(filename));
+
+                // aca armamos el path relativo
+                strcpy(name,filename);
+                strcat(name,"/");
+                strcat(name,ent->d_name);
+
+                stat(name, &path_stat);
+                if(S_ISREG(path_stat.st_mode))
+                    enqueue(files, &name);
             }
-            printf("ERA UN DIR \n");
-        } 
+        }
         else{
             // si no es directorio o file nos vamos
             exit(1);
