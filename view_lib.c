@@ -55,12 +55,6 @@ void * connect_to_shm(shm_info * mem_info, off_t size){
 	//mapeo la memoria con su actual size
     void * ptr_shm = mapping_shm(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0);
 	*mem_info = (shm_info) ptr_shm;	
-	// printf("check1: %p \n", ptr_shm);
-	// printf("check2: %p \n", *mem_info);
-	printf("fetching string %s \n", (char *) ptr_shm + sizeof(t_shm_info));
-	printf("original %p \n", (char *) ptr_shm + sizeof(t_shm_info));
-	printf("mem_info %p \n", (*mem_info)->last_elem_ptr);
-	printf("fetching string correctly %s \n", (*mem_info)->last_elem_ptr);
 	return ptr_shm;
 }
 
