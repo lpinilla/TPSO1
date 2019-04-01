@@ -12,6 +12,7 @@
 #include <sys/stat.h>        /* For mode constants */
 #include <fcntl.h>           /* For O_* constants */
 #include <string.h>
+#include "utilities/queue.h"
 
 
 #define SHM_NAME "/shm"

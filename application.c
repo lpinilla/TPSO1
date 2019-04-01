@@ -3,6 +3,11 @@
 #define NUMBER_OF_SLAVES 5
 
 int main(){
+
+    // creamos la cola que va a contener a los files
+    Queue * files = newQueue();
+    queueInit(files);
+
     //imprimir el pid para vision
     printf("%d", getpid());
     int n_of_files = 1;
