@@ -6,7 +6,7 @@ int main(){
 
     // creamos la cola que va a contener a los files
     Queue * files = newQueue();
-    queueInit(files);
+    queueInit(files, sizeof(char*));
 
     //imprimir el pid para vision
     printf("%d", getpid());
