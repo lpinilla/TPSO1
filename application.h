@@ -20,9 +20,9 @@
 
 typedef struct{
     //offset al último elemento agregado
-    size_t offset;
+    size_t offset, has_finished;
     sem_t semaphore;
-    off_t mem_size;
+    off_t mem_size;    
 }t_shm_info;
 
 typedef t_shm_info * shm_info;

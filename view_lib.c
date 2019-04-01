@@ -1,31 +1,19 @@
 #include "view.h"
 
-void print_hashes(void * hash_start, shm_info mem_info, int n_of_files){
-    //char** hash_ptr = (char **) hash_start + sizeof(t_shm_info);
-    //esto consultar con Ariel:)	
+void print_hashes(void * hash_start, shm_info mem_info, int n_of_files){	//arreglar
     for(int i=0; i<n_of_files; i++){
 		if (sem_wait(&mem_info->semaphore) < 0) {			
 			printf("error\n");
 			printf("%s\n", strerror(errno));
 			exit(EXIT_FAILURE);//error
 		}
-		printf("probando \n");
-		//printf("testing %s \n", *(mem_info->last_elem_ptr));
-
-    	
-		//print_hash(*hash_ptr);
-		printf("aloi? \n");
+		printf("%s\n", (char *) hash_start + mem_info->offset);
 		if( sem_post(&mem_info->semaphore)){
 			printf("error\n");
 			printf("%s\n", strerror(errno));
 			exit(EXIT_FAILURE);//error
 		}
-        //hash_ptr+=sizeof(char *);
 	}
-}
-
-void print_hash(char *hash_ptr){
-    printf("%s\n",hash_ptr);
 }
 
 int open_shm(const char *name, int oflag, mode_t mode){
@@ -64,6 +52,7 @@ void mem_disconnect(void * ptr_shm, shm_info mem_info){
 		exit(EXIT_FAILURE);
 	}
     //shm_unlink(SHM_NAME);
+	//close?
 }
 
 void check_arguments(int argc, char ** argv){

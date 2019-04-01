@@ -30,6 +30,7 @@ void * create_shared_memory(off_t size){
 shm_info initialize_shared_memory(void * shm_ptr, int n_of_files){
     t_shm_info shm_info;
     shm_info.offset = 0;
+    shm_info.has_finished = 0;
     shm_info.mem_size = calculate_size(n_of_files);
     //inicializando el semáforo con valor 1
     if (sem_init(&shm_info.semaphore, 1, 1 ) < 0 ){
