@@ -17,6 +17,9 @@ int main(){
 }
 
 void md5_call_test(void){
-    //assert_equals(process_hash("../Sistemas_Operativos_TP1_Q1_2019.pdf"),
-    //"dbbc672b0dec675712e78f98cfe88c25 ../Sistemas_Operativos_TP1_Q1_2019.pdf", sizeof(char));
+    char * expected = "dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf" ;
+    int length = strlen(expected);
+    char buff[length];
+    call_md5("../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
+    assert_equals(buff, expected, sizeof(char) * length);
 }
