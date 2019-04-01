@@ -11,6 +11,7 @@
 #include <semaphore.h>
 #include <unistd.h>
 #include "application.h"
+#include "./utilities/utils.h"
 
 
 //opens or creates an existing shared memory object.
@@ -19,25 +20,21 @@ int open_shm(const char *name, int oflag, mode_t mode);
 
 //creates a new mapping in the virtual address space of the calling process
 //returns a pointer to the mapped area
-void **mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t offset);
+void * mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t offset);
 
 //creates a new semaphore or opens an existin semaphore
 //returns the address of the new or existing semaphore
 sem_t *open_sem(const char *name, int oflag, mode_t mode, unsigned int value);
 
-void print_hashes(char** hash_start, shm_info str);
+void print_hashes(void * hash_start, shm_info str, int n_of_files);
 
 void print_hash(char *hash_ptr);
 
-//función para guardar una referncia a la estructura en el primer puntero
-//de la memoria compartida
-shm_info get_shm_info(int fd_shm);
-
 //función para conectar este proceso con la memoria compartida
-void ** connect_to_shm(shm_info * mem_info);
+void * connect_to_shm(shm_info * mem_info, off_t size);
 
 //función para desconectarse a la memoria compartida
-void mem_disconnect(void ** ptr_shm, shm_info mem_info);
+void mem_disconnect(void * ptr_shm, shm_info mem_info);
 
 //función para verificar la cantidad de argumentos de vision
 void check_arguments(int argc, char ** argv);

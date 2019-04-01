@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "queue.h": "c"
+        "queue.h": "c",
+        "testing_suite.h": "c"
     }
 }

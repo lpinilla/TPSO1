@@ -1,11 +1,14 @@
 #include "view.h"
 
 int main(int argc, char ** argv){
-	check_arguments(argc, argv);
-	//conectarse a la memoria
+	check_arguments(argc, argv);	
 	shm_info mem_info = NULL;
-	void ** ptr_shm = connect_to_shm(&mem_info);
-	print_hashes((char**) ptr_shm, mem_info);
+	//conectarse a la memoria
+	int n_of_files = 1; 	//cambiar, esto lo va a recibir del pipe
+	void * ptr_shm = connect_to_shm(&mem_info, calculate_size(n_of_files)); //corregir el tamaño
+
+	print_hashes(ptr_shm, mem_info, 1);
+
 
 	mem_disconnect(ptr_shm, mem_info);
 	return 0;
