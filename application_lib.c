@@ -29,11 +29,12 @@ void * create_shared_memory(off_t size){
 
 shm_info initialize_shared_memory(void * shm_ptr, int n_of_files){
     t_shm_info shm_info;
-    shm_info.offset = sizeof(t_shm_info); //apuntar a donde empiezan los hashes
+    //apuntar a donde empiezan los hashes
+    shm_info.offset = sizeof(t_shm_info); 
     shm_info.has_finished = 0;
     shm_info.mem_size = calculate_size(n_of_files);
-    //inicializando el semáforo con valor 1
-    if (sem_init(&shm_info.semaphore, 1, 1 ) < 0 ){
+    //inicializando el semáforo con valor 0
+    if (sem_init(&shm_info.semaphore, 1, 0 ) < 0 ){
         perror("Error initializing semaphore");
         unlink(SHM_NAME);
         exit(EXIT_FAILURE);
@@ -42,7 +43,7 @@ shm_info initialize_shared_memory(void * shm_ptr, int n_of_files){
     return shm_ptr;
 }
 
-void clear_shared_memory(void * shm_ptr, int n_of_files, shm_info mem_info){  
+void clear_shared_memory(void * shm_ptr, shm_info mem_info){  
     sem_destroy(&mem_info->semaphore);
     munmap(shm_ptr, mem_info->mem_size);
     shm_unlink(SHM_NAME);
@@ -56,18 +57,17 @@ void save_buffer_to_file(void * shm_ptr, int n_of_files){
     fclose(file);
 }
 
-void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){    
-    if( sem_wait(&mem_info->semaphore) < 0){
+void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){   
+    if( sem_post(&mem_info->semaphore) < 0){
         perror("Error in wait");
+        clear_shared_memory(shm_ptr, mem_info);
         exit(EXIT_FAILURE);
-    }
+    } 
     //escribir
     strcpy(shm_ptr + mem_info->offset, hash);
     //desplazarse
     mem_info->offset += HASH_NAME_SIZE;
-    if( sem_post(&mem_info->semaphore) < 0){
-        perror("Error in wait");
-        exit(EXIT_FAILURE);
-    }
+    //avisar que hay algo escrito
+    
 }
 

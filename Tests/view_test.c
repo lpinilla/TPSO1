@@ -41,6 +41,6 @@ void get_shm_info_test(){
     }
     waitpid(cpid, NULL, 0);
     read(fds[0], &ret, sizeof(shm_info));    
-    clear_shared_memory(shm_ptr, n_of_files, mem_info);
+    clear_shared_memory(shm_ptr, mem_info);
     assert_true(!ret);
 }

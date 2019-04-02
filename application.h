@@ -31,7 +31,7 @@ typedef t_shm_info * shm_info;
 void * create_shared_memory(off_t size);
 
 //desvincularse de la memoria compartida y limpiar todos los punteros
-void clear_shared_memory(void * shm_ptr, int n_of_files, shm_info mem_info);
+void clear_shared_memory(void * shm_ptr, shm_info mem_info);
 
 /*función para inicializar el 1er bloque de la memoria compartida que es
 **un puntero de tipo shm_info */

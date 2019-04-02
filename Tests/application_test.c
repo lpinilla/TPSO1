@@ -48,7 +48,7 @@ void shared_memory_test(){
         close(fd[1]);
         
         if( munmap(ptr,calculate_size(n_of_files)) == -1){
-            clear_shared_memory(mem_ptr, n_of_files, mem_info);
+            clear_shared_memory(mem_ptr, mem_info);
             perror("Error dettaching memory");
             exit(EXIT_FAILURE);
         }
@@ -59,7 +59,7 @@ void shared_memory_test(){
     //cerrar el fd y desvincular la memoria
     close(fd[0]);
     aux = *((char **) mem_ptr + sizeof(t_shm_info));
-    clear_shared_memory(mem_ptr, n_of_files, mem_info);
+    clear_shared_memory(mem_ptr, mem_info);
     if(aux == NULL || result == NULL){
         exit(EXIT_FAILURE);
     }
@@ -103,6 +103,6 @@ void write_hash_to_shm_test(){
     //checkear si lo que hay en memoria es lo mismo que buff
     aux = strncmp(buff, shm_ptr + sizeof(t_shm_info), HASH_NAME_SIZE);
     free(buff);
-    clear_shared_memory(shm_ptr, n_of_files, mem_info);
+    clear_shared_memory(shm_ptr, mem_info);
     assert_true(!aux);
 }

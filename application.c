@@ -51,7 +51,7 @@ int main(int argc, char ** argv){
     }
 
     //desvincularse a la memoria y liberarla
-    clear_shared_memory(shm_ptr, n_of_files, mem_info);
+    clear_shared_memory(shm_ptr, mem_info);
 
 }
 

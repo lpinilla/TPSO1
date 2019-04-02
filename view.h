@@ -26,7 +26,7 @@ void * mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t 
 //returns the address of the new or existing semaphore
 sem_t *open_sem(const char *name, int oflag, mode_t mode, unsigned int value);
 
-void print_hashes(void * hash_start, shm_info str, int n_of_files);
+void print_hashes(void * hash_start, shm_info str);
 
 void print_hash(char *hash_ptr);
 

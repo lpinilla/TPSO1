@@ -4,13 +4,17 @@
 #include "../view.h"
 
 void app_vision_integration_test();
+void write_and_read_continuous_test();
 void ejemplo_profe();
+void multiple_write_with_sleep();
 
 int main(void){
     create_suite("Testing the Application & Vision Integration");
 
     add_test(app_vision_integration_test);
     //add_test(ejemplo_profe);
+    add_test(write_and_read_continuous_test);
+    add_test(multiple_write_with_sleep);
 
     run_suite();
     
@@ -22,9 +26,9 @@ int main(void){
 
 void app_vision_integration_test(){
     //como si estuvieramos arrancando application
-    int n_of_files = 1, cpid = 0, mypid = getpid(), child_status = 0, fd[2], stdout_saved = dup(STDOUT_FILENO);
+    int n_of_files = 1, cpid = 0, mypid = getpid(), child_status = 0, fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO);
     void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
-    char buffer[HASH_NAME_SIZE];
+    char buffer[HASH_NAME_SIZE], * const str = (char * const) malloc(5 * sizeof(char));
     memset(buffer, 0, HASH_NAME_SIZE);
     shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
     if(pipe(fd) < 0){
@@ -53,10 +57,10 @@ void app_vision_integration_test(){
         perror("Fork error");
         exit(EXIT_FAILURE);
     }else if(cpid == 0){ //hijo
-        char * const str = (char * const) malloc(5 * sizeof(char));
         sprintf(str, "%d", mypid);
         char * argv[] = {"../view.so", str, NULL};
         if( execv("../view.so", argv) == -1){
+            free(str);
             perror("Excec error");
             exit(EXIT_FAILURE);
         }
@@ -70,8 +74,10 @@ void app_vision_integration_test(){
     //leer el printf
     read(fd[0], buffer, HASH_NAME_SIZE);
     close(fd[0]);
-    clear_shared_memory(shm_ptr, n_of_files, mem_info);
+    clear_shared_memory(shm_ptr, mem_info);
     //check_child_status(child_status);
+    free(str);
+    free(buff);
     assert_true(!strncmp(buffer,
                         "dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n",
                         HASH_NAME_SIZE));
@@ -110,7 +116,6 @@ void ejemplo_profe(){
       sleep(1);
     }
   }
-
   waitpid(cpid, NULL, 0);
   munmap(shm_ptr, 100 * sizeof(char *));
   shm_unlink("/SHM_NAME");
@@ -118,5 +123,139 @@ void ejemplo_profe(){
 
 //escribir un archivo, esperar y escribir otro mientras vision lee
 void write_and_read_continuous_test(){
+  int n_of_files = 1, cpid = 0, mypid = getpid(), fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO), aux = 0;
+  void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
+  char buffer[2][HASH_NAME_SIZE];
+  memset(buffer[0], 0, HASH_NAME_SIZE);
+  memset(buffer[1], 0, HASH_NAME_SIZE);
+  shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
 
+  if(pipe(fd) < 0){
+      perror("pipe");
+      exit(EXIT_FAILURE);
+  }
+
+  char * buff = (char *) malloc(256 * sizeof(char)), * const str = (char * const) malloc(5 * sizeof(char));
+  if(buff == NULL){
+      perror("Malloc error");
+      exit(EXIT_FAILURE);
+  }
+  memset(buff, 0, 256 * sizeof(char)); //limpiar todo el buffer
+  call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
+  write_hash_to_shm(shm_ptr, mem_info, buff);
+  
+  //cerrando stdout
+  close(STDOUT_FILENO);
+  dup(fd[1]);
+  close(fd[1]);
+  
+  //ejecutar view.c
+  cpid = fork();
+  if(cpid < 0){
+    perror("Fork error");
+    exit(EXIT_FAILURE);
+  }else if(cpid == 0){ //hijo
+    sprintf(str, "%d", mypid);
+    char * argv[] = {"../view.so", str, NULL};
+    if( execv("../view.so", argv) == -1){
+      perror("Excec error");
+      exit(EXIT_FAILURE);
+    }
+    exit(EXIT_SUCCESS);
+  }
+  //reestablecer stdout
+  fflush(stdout);
+  dup2(stdout_saved, STDOUT_FILENO);
+  close(stdout_saved);
+  //limpiar y volver a escribir al buffer
+  memset(buff, 0, 256 * sizeof(char));
+  call_command("md5sum ../README.md", buff);
+  write_hash_to_shm(shm_ptr, mem_info, buff);
+  mem_info->has_finished = 1;
+  //leer el printf
+  read(fd[0], buffer[0], 73 * sizeof(char));
+  read(fd[0], buffer[1], 48 * sizeof(char));
+  close(fd[0]);
+  //comparar
+  aux = strcmp("dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n", buffer[0]);
+  aux += strcmp("d9ef87b76ded9d5724be49eadc210552  ../README.md\n", buffer[1]);
+  //limpiar y liberar memorias
+  clear_shared_memory(shm_ptr, mem_info);
+  free(str);
+  free(buff);
+  assert_true(!aux);
+}
+
+//Test que prueba si vision se va actualizando si el padre escribe después
+void multiple_write_with_sleep(){
+  int n_of_files = 1, cpid = 0, mypid = getpid(), fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO), aux = 0;
+  void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
+  char buffer[HASH_NAME_SIZE], * commands[3], * const str = (char * const) malloc(5 * sizeof(char));  
+  char output[3][HASH_NAME_SIZE];
+  memset(output[0], 0, HASH_NAME_SIZE);
+  memset(output[1], 0, HASH_NAME_SIZE);
+  memset(output[2], 0, HASH_NAME_SIZE);
+  commands[0] = "md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf";
+  commands[1] = "md5sum ../README.md";
+  commands[2] = "md5sum ./hashing_file.txt";;
+  memset(buffer, 0, HASH_NAME_SIZE);
+  shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
+  char * buff = (char *) malloc(256 * sizeof(char));
+  if(buff == NULL){
+      perror("Malloc error");
+      exit(EXIT_FAILURE);
+  }
+  memset(buff, 0, 256 * sizeof(char)); //limpiar todo el buffer
+  call_command(commands[0], buff);
+  write_hash_to_shm(shm_ptr, mem_info, buff);
+  //creando pipe
+  if(pipe(fd) < 0){
+      perror("pipe");
+      exit(EXIT_FAILURE);
+  }
+
+  //cerrando stdout
+  close(STDOUT_FILENO);
+  dup(fd[1]);
+  close(fd[1]);
+
+  //imprimir hash desde la view
+  cpid = fork();
+  if(cpid < 0){
+    perror("Fork error");
+    exit(EXIT_FAILURE);
+  }else if(cpid == 0){ //hijo
+    sprintf(str, "%d", mypid);
+    char * argv[] = {"../view.so", str, NULL};
+    if( execv("../view.so", argv) == -1){
+      perror("Excec error");
+      exit(EXIT_FAILURE);
+    }
+    exit(EXIT_SUCCESS);
+  }
+
+  //reestablecer stdout
+  fflush(stdout);
+  dup2(stdout_saved, STDOUT_FILENO);
+  close(stdout_saved);
+
+  for(int i = 1; i < 3; i++){
+    sleep(1);
+    memset(buff, 0, 256 * sizeof(char));
+    call_command(commands[i], buff);
+    write_hash_to_shm(shm_ptr, mem_info, buff);
+  }
+  mem_info->has_finished = 1;
+  waitpid(cpid, NULL, 0);
+  read(fd[0], output[0], 73 * sizeof(char));
+  read(fd[0], output[1], 47 * sizeof(char));
+  read(fd[0], output[2], 53 * sizeof(char));
+  aux = strcmp(output[0], "dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n");
+  aux += strcmp(output[1], "d9ef87b76ded9d5724be49eadc210552  ../README.md\n");
+  aux += strcmp(output[2], "807a23aca22344e4426f1f73eb2c0109  ./hashing_file.txt\n");
+  //limpiar la memoria
+  clear_shared_memory(shm_ptr, mem_info);
+  free(str);
+  free(buff);
+  assert_true(!aux);
 }

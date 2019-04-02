@@ -2,7 +2,7 @@
 #include "testing_suite.h"
 
 
-//Mi propio framework de testing
+//Framework de testing de código abierto: https://github.com/lpinilla/Tasteful
 
 //              TASTEFUL
 //              _, . '__ . 

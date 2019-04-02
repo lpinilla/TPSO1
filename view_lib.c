@@ -1,22 +1,18 @@
 #include "view.h"
 
-void print_hashes(void * hash_start, shm_info mem_info, int n_of_files){
+void print_hashes(void * hash_start, shm_info mem_info){
 	size_t read_offset = sizeof(t_shm_info);
 	while( !mem_info->has_finished || (read_offset != mem_info->offset) ){
-		if (sem_wait(&mem_info->semaphore) < 0) {			
+		if( sem_wait(&mem_info->semaphore)){
 			printf("error\n");
 			printf("%s\n", strerror(errno));
 			mem_disconnect(hash_start, mem_info);
 			exit(EXIT_FAILURE);
 		}
 		printf("%s", (char *) hash_start + read_offset); //el hash ya tiene un \n
-		if( sem_post(&mem_info->semaphore)){
-			printf("error\n");
-			printf("%s\n", strerror(errno));
-			mem_disconnect(hash_start, mem_info);
-			exit(EXIT_FAILURE);
-		}
 		read_offset += HASH_NAME_SIZE;
+		//avisar que ya leímos todo lo que podíamos
+		
 	}
 }
 
