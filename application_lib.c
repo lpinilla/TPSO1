@@ -29,7 +29,7 @@ void * create_shared_memory(off_t size){
 
 shm_info initialize_shared_memory(void * shm_ptr, int n_of_files){
     t_shm_info shm_info;
-    shm_info.offset = 0;
+    shm_info.offset = sizeof(t_shm_info); //apuntar a donde empiezan los hashes
     shm_info.has_finished = 0;
     shm_info.mem_size = calculate_size(n_of_files);
     //inicializando el semáforo con valor 1
@@ -48,7 +48,7 @@ void clear_shared_memory(void * shm_ptr, int n_of_files, shm_info mem_info){
     shm_unlink(SHM_NAME);
 }
 
-void save_buffer_to_file(void * shm_ptr, int n_of_files){ //cambiar
+void save_buffer_to_file(void * shm_ptr, int n_of_files){
     FILE * file = fopen("result.txt", "w+");
     for(int i = 0; i < n_of_files;i++){
         fprintf(file, "%s \n", (char *) shm_ptr + i * HASH_LENGTH);
@@ -61,14 +61,10 @@ void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){
         perror("Error in wait");
         exit(EXIT_FAILURE);
     }
-    //saber cuanto desplazarse
-    if(mem_info->offset == 0){
-        mem_info->offset += sizeof(t_shm_info);
-    }else{
-        mem_info->offset += HASH_NAME_SIZE; //cambiar a tamaño posta
-    }
     //escribir
     strcpy(shm_ptr + mem_info->offset, hash);
+    //desplazarse
+    mem_info->offset += HASH_NAME_SIZE;
     if( sem_post(&mem_info->semaphore) < 0){
         perror("Error in wait");
         exit(EXIT_FAILURE);

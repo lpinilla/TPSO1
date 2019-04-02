@@ -73,22 +73,18 @@ void run_suite(){
             printf("%d: %s \n",i, "FAIL");
             printf("Killed by signal %d \n", WTERMSIG(child_status));    
             printf("-- return code: %d \n", WEXITSTATUS(child_status));
-            //print_trace();
             printf("\033[0m");
         }else if(WIFSTOPPED(child_status)){
             suite->suite_state = FAILURE;
             printf("\033[0;31m");
-            printf("%d: %s ",i, "FAIL");
-            printf("-- Killed by signal %d \n", WTERMSIG(child_status));    
+            printf("%d: %s ",i, "FAIL");   
             printf("-- return code: %d \n", WEXITSTATUS(child_status));
-            //print_trace();
             printf("\033[0m");
         }else{ //el proceso no terminó
             suite->suite_state = FAILURE;
             printf("\033[0;31m");
             printf("%d: %s \n",i, "FAIL");            
             printf("-- return code: %d \n", WEXITSTATUS(child_status));
-            //print_trace();
             printf("\033[0m");
         }
     }

@@ -1,11 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stddef.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "../utils.h"
-#include <string.h>
-#include "../../application.h"
 
 //utils.c , comandos auxiliares que puede usar cualquier programa
 

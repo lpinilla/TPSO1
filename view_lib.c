@@ -1,24 +1,27 @@
 #include "view.h"
 
-void print_hashes(void * hash_start, shm_info mem_info, int n_of_files){	//arreglar
-    for(int i=0; i<n_of_files; i++){
+void print_hashes(void * hash_start, shm_info mem_info, int n_of_files){
+	size_t read_offset = sizeof(t_shm_info);
+	while( !mem_info->has_finished || (read_offset != mem_info->offset) ){
 		if (sem_wait(&mem_info->semaphore) < 0) {			
 			printf("error\n");
 			printf("%s\n", strerror(errno));
-			exit(EXIT_FAILURE);//error
+			mem_disconnect(hash_start, mem_info);
+			exit(EXIT_FAILURE);
 		}
-		printf("%s\n", (char *) hash_start + mem_info->offset);
+		printf("%s", (char *) hash_start + read_offset); //el hash ya tiene un \n
 		if( sem_post(&mem_info->semaphore)){
 			printf("error\n");
 			printf("%s\n", strerror(errno));
-			exit(EXIT_FAILURE);//error
+			mem_disconnect(hash_start, mem_info);
+			exit(EXIT_FAILURE);
 		}
+		read_offset += HASH_NAME_SIZE;
 	}
 }
 
 int open_shm(const char *name, int oflag, mode_t mode){
-    int fd_shm = shm_open(name, oflag, mode); 
-	
+    int fd_shm = shm_open(name, oflag, mode); 	
 	if (fd_shm == -1) {
 		printf("Error\n");
 		printf("%s\n", strerror(errno));
@@ -47,7 +50,7 @@ void * connect_to_shm(shm_info * mem_info, off_t size){
 }
 
 void mem_disconnect(void * ptr_shm, shm_info mem_info){
-	if( munmap(ptr_shm, mem_info->mem_size) == -1){ //sacar el hardcodeo
+	if(munmap(ptr_shm, mem_info->mem_size) == -1){
 		perror("munmap");
 		exit(EXIT_FAILURE);
 	}
@@ -63,5 +66,5 @@ void check_arguments(int argc, char ** argv){
 	}else{
 		app_pid = atoi(argv[1]); //pasar a int el pid del padre
 	}
-	app_pid++; //para que deje compilar
+	app_pid++; //TODO: para que deje compilar
 }

@@ -22,10 +22,15 @@ int main(void){
 
 void app_vision_integration_test(){
     //como si estuvieramos arrancando application
-    printf("%d \n", getpid());
-    int n_of_files = 1, cpid = 0, mypid = getpid(), child_status = 0;
+    int n_of_files = 1, cpid = 0, mypid = getpid(), child_status = 0, fd[2], stdout_saved = dup(STDOUT_FILENO);
     void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
+    char buffer[HASH_NAME_SIZE];
+    memset(buffer, 0, HASH_NAME_SIZE);
     shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
+    if(pipe(fd) < 0){
+      perror("pipe");
+      exit(EXIT_FAILURE);
+    }
     //agarramos un hash llamando a md5sum
     char * buff = (char *) malloc(256 * sizeof(char));
     if(buff == NULL){
@@ -35,6 +40,13 @@ void app_vision_integration_test(){
     memset(buff, 0, 256 * sizeof(char)); //limpiar todo el buffer
     call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
     write_hash_to_shm(shm_ptr, mem_info, buff);
+    mem_info->has_finished = 1; //se terminaron los archivos
+
+    //cerrando stdout
+    close(STDOUT_FILENO);
+    dup(fd[1]);
+    close(fd[1]);
+
     //imprimir hash desde la view
     cpid = fork();
     if(cpid < 0){
@@ -51,9 +63,18 @@ void app_vision_integration_test(){
         exit(EXIT_SUCCESS);
     }
     waitpid(cpid, &child_status, 0);
+    //reestablecer stdout
+    fflush(stdout);
+    dup2(stdout_saved, STDOUT_FILENO);
+    close(stdout_saved);
+    //leer el printf
+    read(fd[0], buffer, HASH_NAME_SIZE);
+    close(fd[0]);
     clear_shared_memory(shm_ptr, n_of_files, mem_info);
-    check_child_status(child_status);
-    assert_true(1); //cambiar
+    //check_child_status(child_status);
+    assert_true(!strncmp(buffer,
+                        "dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n",
+                        HASH_NAME_SIZE));
 }
 
 void ejemplo_profe(){

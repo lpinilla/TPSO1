@@ -1,6 +1,14 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include "../application.h"
+
 #define MAX_FILE_NAME 256
 #define HASH_LENGTH 32
 #define AUX_HASH_CHARS 2

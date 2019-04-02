@@ -6,6 +6,8 @@ void test3(void);
 void test4(void);
 void test5(void);
 void test6(void);
+void test7(void);
+void test8(void);
 //faltan tests
 
 int main(void){
@@ -18,6 +20,8 @@ int main(void){
     add_test(test4);
     add_test(test5);
     add_test(test6);
+    add_test(test7);
+    add_test(test8);
 
     run_suite();
     
@@ -52,6 +56,16 @@ void test6(){
     int a = 1;
     int b = 2;
     assert_not_equals(&a,&b, sizeof(int));
+}
+
+void test7(){
+    char * hello = "hello", * hello2 = "hello";
+    assert_equals(hello, hello2, sizeof(char) * 6);
+}
+
+void test8(){
+    char * hello = "hello\n", * hello2 = "hello";
+    assert_not_equals(hello, hello2, sizeof(char) * 7);
 }
 
 //FALTA TESTEAR
