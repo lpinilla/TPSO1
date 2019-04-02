@@ -115,3 +115,8 @@ void ejemplo_profe(){
   munmap(shm_ptr, 100 * sizeof(char *));
   shm_unlink("/SHM_NAME");
 }
+
+//escribir un archivo, esperar y escribir otro mientras vision lee
+void write_and_read_continuous_test(){
+
+}

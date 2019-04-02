@@ -5,7 +5,6 @@
 void shared_memory_test();
 void save_buffer_to_file_test();
 void write_hash_to_shm_test();
-void write_and_read_hash_to_shm_test();
 
 int main(void){
     create_suite("Testing the Application");
@@ -13,7 +12,6 @@ int main(void){
     //add_test(shared_memory_test);
     add_test(save_buffer_to_file_test);
     add_test(write_hash_to_shm_test);
-    add_test(write_and_read_hash_to_shm_test);
 
     run_suite();
     
@@ -23,7 +21,7 @@ int main(void){
 }
 
 //probar que puede acceder y leer desde la memoria compartida
-void shared_memory_test(){ //free(): invalid pointer en algún lado
+void shared_memory_test(){
     int n_of_files = 1;
     char * result = NULL, * aux = NULL, * string = (char *) malloc(13 * sizeof(char));
     //creando memoria y escribiendola
@@ -44,12 +42,12 @@ void shared_memory_test(){ //free(): invalid pointer en algún lado
     }else if(pid == 0){ //proceso hijo
         //abrir la memoria compartida
         int shmid = shm_open(SHM_NAME, O_RDONLY, 0660);
-        void * ptr = mmap(NULL, n_of_files * sizeof(char *) + sizeof(t_shm_info), PROT_READ, MAP_SHARED, shmid, 0);
+        void * ptr = mmap(NULL, calculate_size(n_of_files), PROT_READ, MAP_SHARED, shmid, 0);
         //decirle al padre lo que leyó
         write(fd[1], ((char **) ptr + sizeof(t_shm_info)), sizeof(char *));
         close(fd[1]);
         
-        if( munmap(ptr, n_of_files * sizeof(char *) + sizeof(t_shm_info)) == -1){
+        if( munmap(ptr,calculate_size(n_of_files)) == -1){
             clear_shared_memory(mem_ptr, n_of_files, mem_info);
             perror("Error dettaching memory");
             exit(EXIT_FAILURE);
@@ -92,7 +90,7 @@ void save_buffer_to_file_test(){
 
 void write_hash_to_shm_test(){
     int n_of_files = 1, aux = 0;
-    void * shm_ptr = create_shared_memory(n_of_files * sizeof(char *) + sizeof(t_shm_info));
+    void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
     shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
     char * buff = (char *) malloc(256 * sizeof(char));
     if(buff == NULL){
@@ -103,45 +101,8 @@ void write_hash_to_shm_test(){
     call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
     write_hash_to_shm(shm_ptr, mem_info, buff);
     //checkear si lo que hay en memoria es lo mismo que buff
-    aux = strcmp((char *) *((void **)shm_ptr + sizeof(t_shm_info)), buff);
+    aux = strncmp(buff, shm_ptr + sizeof(t_shm_info), HASH_NAME_SIZE);
     free(buff);
-    clear_shared_memory(shm_ptr, n_of_files, mem_info);
-    assert_true(!aux);
-}
-
-
-void write_and_read_hash_to_shm_test(){
-    int n_of_files = 1, aux = 0, cpid = 0, fd[2] = {0,1};
-    void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
-    shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
-    char * buff = (char *) malloc(256 * sizeof(char)), ** result = malloc(sizeof(char *));
-    if(buff == NULL){
-        perror("Malloc error");
-        exit(EXIT_FAILURE);
-    }
-    memset(buff, 0, 256 * sizeof(char)); //limpiar todo el buffer
-    call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
-    write_hash_to_shm(shm_ptr, mem_info, buff);
-    //checkear si lo que hay en memoria es lo mismo que buff
-    if(pipe(fd) < 0){
-        perror("Pipe error");
-        exit(EXIT_FAILURE);
-    }
-    cpid = fork();
-    if(cpid < 0){
-        perror("Fork error");
-        exit(EXIT_FAILURE);
-    }else if(cpid == 0){
-        write(fd[1], (char *) ((void *)shm_ptr + sizeof(t_shm_info)), sizeof(char *));
-        close(fd[1]);
-        exit(EXIT_SUCCESS);
-    }
-    waitpid(cpid, NULL, 0);
-    read(fd[0], result, sizeof(char *));    
-    aux = strcmp(*result, buff);
-    free(buff);
-    free(result);
-    close(fd[0]);
     clear_shared_memory(shm_ptr, n_of_files, mem_info);
     assert_true(!aux);
 }
