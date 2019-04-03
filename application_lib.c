@@ -64,7 +64,7 @@ void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){
         exit(EXIT_FAILURE);
     } 
     //escribir
-    strcpy(shm_ptr + mem_info->offset, hash);
+    strcpy((char *) shm_ptr + mem_info->offset, hash);
     //desplazarse
     mem_info->offset += HASH_NAME_SIZE;
     //avisar que hay algo escrito

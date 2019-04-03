@@ -1,8 +1,4 @@
 #include "application.h"
-#include <sys/types.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include "utilities/queue.h"
 
 #define NUMBER_OF_SLAVES 5
 
