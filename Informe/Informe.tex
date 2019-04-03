@@ -1,0 +1,59 @@
+\documentclass[]{article}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{listings}
+%opening
+\title{Trabajo Pr\'actico 1 - SO - ITBA}
+\author{Lpinilla}
+\date{30 Octubre 2018}
+
+\begin{document}
+	
+\maketitle
+
+\subsection*{Especificaciones t\'ecnicas}
+Instrucciones de compilaci\'on y ejecuci\'on y donde se corri\'o
+El Trabajo Pr\'actico fue siempre compilado y ejecutado con la ayuda de un archivo makefile inclu\'ido en el repositorio como parte del trabajo pr\'actico.
+	
+\section*{Decisiones durante del desarrollo}
+	contenidos...
+	
+\section*{Limitaciones}
+
+	contenidos..
+
+\section*{Problemas encontrados en el desarrollo y posibles soluciones}
+
+\subsection{Uso compartido de punteros entre procesos}
+Un problema con el que nos encontramos fue el uso compartido de punteros entre procesos. Inicialmente, por cuestiones de eficiencia espacial y para simplificar otros c\'alculos, cre\'iamos que la mejor manera de manejarse con los strings de formato hash nombre archivo era guardando un puntero char * que contuviera el string.\\
+
+Esto causaba segmentation faults ya que el proceso Vision estaba accediendo a un puntero que correspond\'ia a una zona de memoria fuera de la que le correspond\'ia.\\
+
+La soluci\'on que encontramos para este problema fue de abandonar la idea de compartir punteros y simplemente hacer una "copia profunda" del string.
+
+\subsection{Uso compartido de punteros en zona compartida}
+Otro problema que tuvimos, similar al anteriormente mencionado fue que quer\'iamos tener un puntero al pr\'oximo elemento a agregar para facilitar la escritura y lectura. Pronto nos dimos cuenta que cuando nunca \'ibamos a poder crear este puntero ya que cada proceso accede a la memoria compartida virtualmente, con lo que sus direcciones a la memoria compartida son distintas.\\
+
+La soluci\'on que encontramos para esto fue utilizar un valor de tipo size\_t como offset de la memoria compartida, permiti\'endonos la facilidad de acceder al \'ultimo elemento sin los problemas mencionados.
+
+\section*{Citas a c\'odigos externos usados}
+
+Algunos de los archivos extra\'idos de internet fueron modificados para adaptarlos al uso que se les requer\'ia
+
+\begin{center}
+	\begin{table} [!h]
+	\begin{tabular}{ |c|c| }
+		\hline
+		Archivo & Link \\
+		\hline
+		Queue.c & https://codereview.stackexchange.com/questions/141238/implementing-a-generic-queue-in-c \\
+		\hline
+		Tasteful.c & https://github.com/lpinilla/Tasteful \\
+		\hline
+	\end{tabular}
+
+	\end{table}
+\end{center}
+	
+
+\end{document}
