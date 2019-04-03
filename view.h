@@ -10,6 +10,8 @@
 #include <sys/stat.h> /* For mode constants */ 
 #include <semaphore.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <signal.h>
 #include "application.h"
 #include "./utilities/utils.h"
 

@@ -35,7 +35,8 @@ debug: all #primero limpiar y compilar todo
 	@cppcheck $(CPPFLAGS) $(TESTS:=.c)
 	@cppcheck $(CPPFLAGS) $(TEST_SOURCES:=.c)
 	#----------------------------------checkeos de los binarios con valgrind
-	#$(foreach f, $(TARGETS:=).so, valgrind ./$f)
+	$(foreach f, $(TARGETS:=.so), valgrind ./$f)
+	$(foreach f, $(TESTS:=.so), valgrind ./$f)
 
 test: all $(TESTS) #correr todas las suites de test
 	@$(CC_C) $(CFLAGS) Testing/$(TASTEFUL).c -o Tests/$(TASTEFUL).so

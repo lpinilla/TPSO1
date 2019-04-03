@@ -57,11 +57,13 @@ void mem_disconnect(void * ptr_shm, shm_info mem_info){
 void check_arguments(int argc, char ** argv){
 	int app_pid = 0;
 	if(argc < 2){
-		printf("application's pid must be given");
+		printf("application's pid must be given\n");
 		exit(EXIT_FAILURE);
 	}else{
-		app_pid = atoi(argv[1]); //pasar a int el pid del padre
+		app_pid = atoi(argv[1]);
 	}
-	app_pid++; //TODO: para que deje compilar
-	//verificar que el proceso este corriendo
+	if( kill(app_pid, 0) < 0 ){
+		printf("Application is not running, exiting \n");
+		exit(EXIT_FAILURE);
+	}
 }
