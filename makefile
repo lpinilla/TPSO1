@@ -15,7 +15,7 @@ CROSS_TOOL =
 CC_C = $(CROSS_TOOL) gcc
 
 CFLAGS = -Wall -Werror -g -pthread
-CPPFLAGS = --quiet --enable=all --force --inconclusive --suppress=missingIncludeSystem --suppress=unusedFunction
+CPPFLAGS = --quiet --enable=all --force --inconclusive --suppress=missingIncludeSystem --suppress=unusedFunction --inline-suppr
 
 all: clean $(TARGETS)
 
@@ -30,10 +30,10 @@ clean:
 
 debug: all #primero limpiar y compilar todo
 	#----------------------------------checkeos cppcheck
-	cppcheck $(CPPFLAGS) $(TARGETS:=.c)
-	cppcheck $(CPPFLAGS) $(SOURCES:=.c)
-	cppcheck $(CPPFLAGS) $(TESTS:=.c)
-	cppcheck $(CPPFLAGS) $(TEST_SOURCES:=.c)
+	@cppcheck $(CPPFLAGS) $(TARGETS:=.c)
+	@cppcheck $(CPPFLAGS) $(SOURCES:=.c)
+	@cppcheck $(CPPFLAGS) $(TESTS:=.c)
+	@cppcheck $(CPPFLAGS) $(TEST_SOURCES:=.c)
 	#----------------------------------checkeos de los binarios con valgrind
 	#$(foreach f, $(TARGETS:=).so, valgrind ./$f)
 

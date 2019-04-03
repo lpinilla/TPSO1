@@ -6,7 +6,7 @@
         {
             "label": "CPPCHECK",
             "type": "shell",
-            "command": "cppcheck --quiet --enable=all --force --inconclusive --suppress=missingIncludeSystem --suppress=unusedFunction  ${file}",
+            "command": "cppcheck --quiet --enable=all --force --inconclusive --suppress=missingIncludeSystem --suppress=unusedFunction --inline-suppr --xml  ${file}",
             "problemMatcher": [
                 "$gcc"
             ],

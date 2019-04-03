@@ -136,7 +136,7 @@ inline void assert_false(int i){ //podría ser una macro
 //https://stackoverflow.com/questions/9555837/how-to-know-caller-function-when-tracing-assertion-failure
 void print_trace(void){
     void * array[10];
-    size_t size, i;
+    ssize_t size, i;
     char ** strings;
     size = backtrace(array, 10);
     strings = backtrace_symbols(array, size);

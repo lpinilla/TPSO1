@@ -43,7 +43,7 @@ void peek_value_test(){
 }
 
 void queue_erase_test(){
-    int val = 1, aux = 3;
+    int val = 1, aux = 0;
     Queue q;
     queueInit(&q, sizeof(int));
     enqueue(&q, &val);

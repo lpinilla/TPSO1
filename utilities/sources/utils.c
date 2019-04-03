@@ -9,7 +9,7 @@ void call_command(char * command, char * buffer){
     FILE * fd;
     fd = popen(command, "r");
     int i = 0;
-    char c;
+    int c = 0;
     while ( (c=getc(fd)) != '\n' && c!=EOF ){
         buffer[i] = c;
         i++;

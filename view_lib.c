@@ -63,4 +63,5 @@ void check_arguments(int argc, char ** argv){
 		app_pid = atoi(argv[1]); //pasar a int el pid del padre
 	}
 	app_pid++; //TODO: para que deje compilar
+	//verificar que el proceso este corriendo
 }

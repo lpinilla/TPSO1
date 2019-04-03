@@ -69,7 +69,7 @@ void shared_memory_test(){
 
 void save_buffer_to_file_test(){
     int n_of_files = 2, ret = 0;
-    void * strings = (void *) malloc(2 * HASH_LENGTH);
+    char * strings = (char *) malloc(2 * HASH_LENGTH);
     char cmd_ret = 0, buff[HASH_LENGTH * 2];
     memset(strings, 0, 2 * HASH_LENGTH);
     strcpy(strings, "hello");
@@ -77,7 +77,9 @@ void save_buffer_to_file_test(){
     save_buffer_to_file(strings, n_of_files);
     //leer del archivo
     FILE * file = fopen("result.txt", "r+");
+    // cppcheck-suppress invalidscanf
     fscanf(file, "%s", buff);
+    // cppcheck-suppress invalidscanf
     fscanf(file, "%s", buff + HASH_LENGTH);
     ret = strncmp(buff, strings, HASH_LENGTH);
     ret += strcmp(buff + HASH_LENGTH, strings + HASH_LENGTH);
@@ -101,7 +103,7 @@ void write_hash_to_shm_test(){
     call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
     write_hash_to_shm(shm_ptr, mem_info, buff);
     //checkear si lo que hay en memoria es lo mismo que buff
-    aux = strncmp(buff, shm_ptr + sizeof(t_shm_info), HASH_NAME_SIZE);
+    aux = strncmp(buff, (char * )shm_ptr + sizeof(t_shm_info), HASH_NAME_SIZE);
     free(buff);
     clear_shared_memory(shm_ptr, mem_info);
     assert_true(!aux);

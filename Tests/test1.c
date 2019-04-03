@@ -31,6 +31,7 @@ int main(void){
 //cambiar los 1eros 2 tests
 
 void test1(){
+    // cppcheck-suppress duplicateExpression
     assert_true(1 == 1);
 }
 
@@ -39,6 +40,7 @@ void test2(){
 }
 
 void test3(){
+    // cppcheck-suppress duplicateExpression
     assert_true('a' == 'a');
 }
 
