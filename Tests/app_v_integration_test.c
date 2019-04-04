@@ -26,11 +26,11 @@ int main(void){
 
 void app_vision_integration_test(){
     //como si estuvieramos arrancando application
-    int n_of_files = 1, cpid = 0, mypid = getpid(), child_status = 0, fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO);
-    void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
+    int cpid = 0, mypid = getpid(), child_status = 0, fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO);
+    void * shm_ptr = create_shared_memory();
     char buffer[HASH_NAME_SIZE], * const str = (char * const) malloc(5 * sizeof(char));
     memset(buffer, 0, HASH_NAME_SIZE);
-    shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
+    shm_info mem_info = initialize_shared_memory(shm_ptr);
     if(pipe(fd) < 0){
       perror("pipe");
       exit(EXIT_FAILURE);
@@ -128,7 +128,7 @@ void write_and_read_continuous_test(){
   char buffer[2][HASH_NAME_SIZE];
   memset(buffer[0], 0, HASH_NAME_SIZE);
   memset(buffer[1], 0, HASH_NAME_SIZE);
-  shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
+  shm_info mem_info = initialize_shared_memory(shm_ptr);
 
   if(pipe(fd) < 0){
       perror("pipe");
@@ -199,7 +199,7 @@ void multiple_write_with_sleep(){
   commands[1] = "md5sum ../README.md";
   commands[2] = "md5sum ./hashing_file.txt";;
   memset(buffer, 0, HASH_NAME_SIZE);
-  shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
+  shm_info mem_info = initialize_shared_memory(shm_ptr);
   char * buff = (char *) malloc(256 * sizeof(char));
   if(buff == NULL){
       perror("Malloc error");

@@ -17,9 +17,9 @@ int main(void){
 }
 
 void get_shm_info_test(){
-    int n_of_files = 0, cpid = 0, fds[2] = {0,1}, ret = 0;
-    void * shm_ptr = create_shared_memory(sizeof(t_shm_info));
-    shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
+    int  cpid = 0, fds[2] = {0,1}, ret = 0;
+    void * shm_ptr = create_shared_memory();
+    shm_info mem_info = initialize_shared_memory(shm_ptr);
     if(pipe(fds) < 0){
         perror("pipe error");
         exit(EXIT_FAILURE);
@@ -30,7 +30,7 @@ void get_shm_info_test(){
         exit(EXIT_FAILURE);
     }else if(cpid == 0){
         shm_info target = NULL;
-        void * shm_ptr = connect_to_shm(&target, sizeof(t_shm_info));
+        void * shm_ptr = connect_to_shm(&target);
         ret = memcmp(mem_info, target, sizeof(t_shm_info));
         write(fds[1], &ret, sizeof(shm_info));
         close(fds[1]);

@@ -26,8 +26,8 @@ int open_shm(const char *name, int oflag, mode_t mode){
 	return fd_shm;
 }
 
-void * mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t offset){
-    void *ptr_shm= mmap(addr,length,prot,flags,fd,offset); //retorna pointer a la nueva map area
+void * mapping_shm(void *addr, int prot, int flags,int fd, off_t offset){
+    void *ptr_shm= mmap(addr,SHM_MAX_SIZE,prot,flags,fd,offset); //retorna pointer a la nueva map area
     if(ptr_shm == (void*)-1){
         printf("Error\n");
         printf("%s\n", strerror(errno));
@@ -36,17 +36,17 @@ void * mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t 
     return ptr_shm;
 }
 
-void * connect_to_shm(shm_info * mem_info, off_t size){
+void * connect_to_shm(shm_info * mem_info){
 	//agarrar el file descriptor de la shared memory
 	int fd_shm = open_shm(SHM_NAME, O_RDWR, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
 	//mapeo la memoria con su actual size
-    void * ptr_shm = mapping_shm(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0);
+    void * ptr_shm = mapping_shm(NULL, PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0);
 	*mem_info = (shm_info) ptr_shm;	
 	return ptr_shm;
 }
 
 void mem_disconnect(void * ptr_shm, shm_info mem_info){
-	if(munmap(ptr_shm, mem_info->mem_size) == -1){
+	if(munmap(ptr_shm, SHM_MAX_SIZE) == -1){
 		perror("munmap");
 		exit(EXIT_FAILURE);
 	}

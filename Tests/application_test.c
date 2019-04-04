@@ -26,7 +26,7 @@ void shared_memory_test(){
     char * result = NULL, * aux = NULL, * string = (char *) malloc(13 * sizeof(char));
     //creando memoria y escribiendola
     void * mem_ptr = create_shared_memory(n_of_files * sizeof(char *) + sizeof(t_shm_info));
-    shm_info mem_info = initialize_shared_memory(mem_ptr, n_of_files);
+    shm_info mem_info = initialize_shared_memory(mem_ptr);
     strcpy(string, "hello world!");    
      *((char **) mem_ptr + sizeof(t_shm_info)) = (char *) string;
     int fd[2] = {0,1};
@@ -42,12 +42,12 @@ void shared_memory_test(){
     }else if(pid == 0){ //proceso hijo
         //abrir la memoria compartida
         int shmid = shm_open(SHM_NAME, O_RDONLY, 0660);
-        void * ptr = mmap(NULL, calculate_size(n_of_files), PROT_READ, MAP_SHARED, shmid, 0);
+        void * ptr = mmap(NULL, SHM_MAX_SIZE, PROT_READ, MAP_SHARED, shmid, 0);
         //decirle al padre lo que leyó
         write(fd[1], ((char **) ptr + sizeof(t_shm_info)), sizeof(char *));
         close(fd[1]);
         
-        if( munmap(ptr,calculate_size(n_of_files)) == -1){
+        if( munmap(ptr,SHM_MAX_SIZE) == -1){
             clear_shared_memory(mem_ptr, mem_info);
             perror("Error dettaching memory");
             exit(EXIT_FAILURE);
@@ -91,9 +91,9 @@ void save_buffer_to_file_test(){
 }
 
 void write_hash_to_shm_test(){
-    int n_of_files = 1, aux = 0;
-    void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
-    shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
+    int  aux = 0;
+    void * shm_ptr = create_shared_memory();
+    shm_info mem_info = initialize_shared_memory(shm_ptr);
     char * buff = (char *) malloc(256 * sizeof(char));
     if(buff == NULL){
         perror("Malloc error");

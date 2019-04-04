@@ -22,7 +22,7 @@ int open_shm(const char *name, int oflag, mode_t mode);
 
 //creates a new mapping in the virtual address space of the calling process
 //returns a pointer to the mapped area
-void * mapping_shm(void *addr, size_t length, int prot, int flags,int fd, off_t offset);
+void * mapping_shm(void *addr, int prot, int flags,int fd, off_t offset);
 
 //creates a new semaphore or opens an existin semaphore
 //returns the address of the new or existing semaphore
@@ -31,7 +31,7 @@ sem_t *open_sem(const char *name, int oflag, mode_t mode, unsigned int value);
 void print_hashes(void * hash_start, shm_info mem_info);
 
 //función para conectar este proceso con la memoria compartida
-void * connect_to_shm(shm_info * mem_info, off_t size);
+void * connect_to_shm(shm_info * mem_info);
 
 //función para desconectarse a la memoria compartida
 void mem_disconnect(void * ptr_shm, shm_info mem_info);

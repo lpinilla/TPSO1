@@ -23,20 +23,19 @@ typedef struct{
     //offset al último elemento agregado
     size_t offset, has_finished;
     sem_t semaphore;
-    off_t mem_size;    
 }t_shm_info;
 
 typedef t_shm_info * shm_info;
 
-//crea una shared memory de tamaño size y conecta la memoria con el proceso
-void * create_shared_memory(off_t size);
+//crea una shared memory de tamaño SHM_MAX_SIZE y conecta la memoria con el proceso
+void * create_shared_memory();
 
 //desvincularse de la memoria compartida y limpiar todos los punteros
 void clear_shared_memory(void * shm_ptr, shm_info mem_info);
 
 /*función para inicializar el 1er bloque de la memoria compartida que es
 **un puntero de tipo shm_info */
-shm_info initialize_shared_memory(void * shm_ptr, int n_of_files);
+shm_info initialize_shared_memory(void * shm_ptr);
 
 //función para guardar todo el buffer a un archivo
 void save_buffer_to_file(void * shm_ptr, int n_of_files);
@@ -45,7 +44,8 @@ void save_buffer_to_file(void * shm_ptr, int n_of_files);
 void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash);
 
 //función auxiliar para calcular el tamaño total de la memoria
-off_t calculate_size(int n_of_files);
+//no la necesitamos mas
+//off_t calculate_size(int n_of_files);
 
 #endif
 

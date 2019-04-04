@@ -17,9 +17,9 @@ int main(int argc, char ** argv){
 
     //imprimir el pid para vision
     printf("%d", getpid());
-    int n_of_files = 1;
-    void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
-    shm_info mem_info = initialize_shared_memory(shm_ptr, n_of_files);
+    //int n_of_files = 1;
+    void * shm_ptr = create_shared_memory();
+    shm_info mem_info = initialize_shared_memory(shm_ptr);
     printf("%p \n", mem_info); //para que me deje compilar
 
     // creamos los fd para los pipes de ida
