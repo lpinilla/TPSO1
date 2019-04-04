@@ -19,6 +19,7 @@
 void call_command(char * command, char * buffer);
 
 //función auxiliar para calcular el tamaño de la memoria basado en la cantidad de archivos
-off_t calculate_size(int n_of_files);
+//no la necesitamos mas
+//off_t calculate_size(int n_of_files);
 
 #endif

@@ -22,10 +22,9 @@ int main(void){
 
 //probar que puede acceder y leer desde la memoria compartida
 void shared_memory_test(){
-    int n_of_files = 1;
     char * result = NULL, * aux = NULL, * string = (char *) malloc(13 * sizeof(char));
     //creando memoria y escribiendola
-    void * mem_ptr = create_shared_memory(n_of_files * sizeof(char *) + sizeof(t_shm_info));
+    void * mem_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(mem_ptr);
     strcpy(string, "hello world!");    
      *((char **) mem_ptr + sizeof(t_shm_info)) = (char *) string;

@@ -123,8 +123,8 @@ void ejemplo_profe(){
 
 //escribir un archivo, esperar y escribir otro mientras vision lee
 void write_and_read_continuous_test(){
-  int n_of_files = 1, cpid = 0, mypid = getpid(), fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO), aux = 0;
-  void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
+  int  cpid = 0, mypid = getpid(), fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO), aux = 0;
+  void * shm_ptr = create_shared_memory();
   char buffer[2][HASH_NAME_SIZE];
   memset(buffer[0], 0, HASH_NAME_SIZE);
   memset(buffer[1], 0, HASH_NAME_SIZE);
@@ -188,8 +188,8 @@ void write_and_read_continuous_test(){
 
 //Test que prueba si vision se va actualizando si el padre escribe después
 void multiple_write_with_sleep(){
-  int n_of_files = 1, cpid = 0, mypid = getpid(), fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO), aux = 0;
-  void * shm_ptr = create_shared_memory(calculate_size(n_of_files));
+  int  cpid = 0, mypid = getpid(), fd[2] = {0,1}, stdout_saved = dup(STDOUT_FILENO), aux = 0;
+  void * shm_ptr = create_shared_memory();
   char buffer[HASH_NAME_SIZE], * commands[3], * const str = (char * const) malloc(5 * sizeof(char));  
   char output[3][HASH_NAME_SIZE];
   memset(output[0], 0, HASH_NAME_SIZE);
