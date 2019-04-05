@@ -15,9 +15,17 @@
 #include <dirent.h>
 #include "utilities/queue.h"
 #include "utilities/utils.h"
+#include "slave.h"
 
 #define SHM_NAME "/shm"
+#define NUMBER_OF_SLAVES 5
+#define BLOCK 10
+#define HASH_LENGTH 32
 
+typedef struct{
+  int pipe_out[2];
+  int pipe_in[2];
+} pipes_type;
 
 typedef struct{
     //offset al último elemento agregado
@@ -46,6 +54,19 @@ void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash);
 //función auxiliar para calcular el tamaño total de la memoria
 //no la necesitamos mas
 //off_t calculate_size(int n_of_files);
+
+//arma la queue de argumentos del proceso padre
+void enqueue_args(Queue * files, int argc, char ** argv);
+
+//envia un archivo al pipe pasado
+void send_file(Queue * files, int pipe_out[2]);
+
+//Recibe el mensaje con el archivo y la pipe de entrada para enviar al padre
+void load_file(char * file_name, int pipe[2]);
+
+//Lee un mensaje del pipe hasta encontrar un caracter 0 y lo retorna
+char * read_pipe(int pipe[2]);
+
 
 #endif
 

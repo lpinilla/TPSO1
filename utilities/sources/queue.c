@@ -4,7 +4,7 @@
 
 
 Queue * newQueue(){
-    Queue * q = calloc(sizeof(*q),0);
+    Queue * q = malloc(sizeof(*q));
     return q;
 }
 

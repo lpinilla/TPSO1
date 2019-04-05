@@ -1,8 +1,7 @@
 #include "application.h"
-
-#define NUMBER_OF_SLAVES 5
-
-void enqueue_args(Queue *, int, char **);
+#include <dirent.h> 
+#include <stdio.h> 
+#include <string.h>
 
 int main(int argc, char ** argv){
     // si no tenemos argumentos no hay nada que hacer
@@ -12,87 +11,113 @@ int main(int argc, char ** argv){
 
     Queue * files = newQueue();
     queueInit(files, sizeof(char*));
-
     enqueue_args(files, argc, argv);
-
+    int files_number = getQueueSize(files);
+    
     //imprimir el pid para vision
-    printf("%d", getpid());
+    //printf("%d", getpid());
     //int n_of_files = 1;
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
-    printf("%p \n", mem_info); //para que me deje compilar
+    //printf("%p \n", mem_info); //para que me deje compilar
 
-    // creamos los fd para los pipes de ida
-    int pipes[NUMBER_OF_SLAVES][2];
-    // abrimos todos los pipes de ida
+    pipes_type pipes[NUMBER_OF_SLAVES];
+
+    // abrimos todos los pipes
     for(int i=0; i<NUMBER_OF_SLAVES; i++){
-        pipe(pipes[i]);
+        if(pipe(pipes[i].pipe_out)==-1){
+            fprintf(stderr, "Error: Pipe creation failed." );
+            return 1;
+        }
+        //fcntl(pipes[i].pipe_out[0], F_SETFL, O_NONBLOCK);
+        if(pipe(pipes[i].pipe_in)==-1){
+            fprintf(stderr, "Error: Pipe creation failed." );
+            return 1;
+        }
+       // fcntl(pipes[i].pipe_in[0], F_SETFL, O_NONBLOCK);
     }
+
+    int p;
+
     // el padre de por si cierra su stdout
-    for(int i=0; i<NUMBER_OF_SLAVES; i++){
-        if(fork()==0){
-            // el hijo cierra su stdin
-            close(0);
-            // lo redireccionamos al pipe correspondiente
-            dup(pipes[i][0]);
-            // para testear usamos esto desp vemos el nombre 
-            char ** argv = NULL;
-            execv("./slave.so", argv);
+    for(int i=0; i<NUMBER_OF_SLAVES && getQueueSize(files)>0 ; i++){
+        p=fork();
+        if(p<0){
+            fprintf(stderr, "Error: Fork failed." );
+            return 1;
+        }
+
+        //Proceso hijo/esclavo
+        else if(p==0){
+            //Cerramos el final de escritura del pipe de salida
+            close(pipes[i].pipe_out[1]);
+            //Cerramos el final de lectura del pipe de entrada
+            close(pipes[i].pipe_in[0]);
+
+            //El hijo entra en ciclo hasta que el padre le indique que cierre
+            while(1){
+                char * msg = read_pipe(pipes[i].pipe_out);
+                if(msg != NULL){
+                    if(*msg == 0){
+                        close(pipes[i].pipe_out[0]);
+                        close(pipes[i].pipe_in[1]);
+                        exit(0);
+                    }else{
+                        load_file(msg, pipes[i].pipe_in);
+                    }
+                    free(msg);
+                }
+            }
+        }
+
+        //Proceso padre
+        else{
+            //Cerramos el final de lectura del pipe de salida
+            close(pipes[i].pipe_out[0]);
+            //Cerramos el final de escritura del pipe de entrada
+            close(pipes[i].pipe_in[1]);
+            //Envia un archivo a cada hijo
+            send_file(files, pipes[i].pipe_out);
         }
     }
-    // el padre les escribe los archivos
-    for(int i=0; i<NUMBER_OF_SLAVES; i++){
-        write(pipes[i][1], "slave.c\n",8);
-        write(pipes[i][1], "slave.h\n",8);
+
+    // el padre recibe los hashes, los guarda en la shm y si quedan archivos por enviar a esclavos los envia
+    while(files_number>0){
+        for(int i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
+            char * hash = read_pipe(pipes[i].pipe_in);
+            if(hash != NULL){
+
+                //Imprimo el hash TEMPORALMENTE hasta ver lo de la shm
+                printf("%s\n", hash);
+                //------
+
+                files_number--;
+
+                //Guarda hash en la shm
+                write_hash_to_shm(shm_ptr, mem_info, hash);
+
+                if(getQueueSize(files)>0){
+                    send_file(files, pipes[i].pipe_out);
+                }
+                free(hash);
+            }
+        }
     }
+
+    //Proceso padre envia un 0 por los pipes a los hijos para indicarles que terminen su proceso
+    char exit_msg = 0;
+    for(int i=0; i<NUMBER_OF_SLAVES;i++){
+        write(pipes[i].pipe_out[1], &exit_msg, 1);
+
+        //Cerramos el final de lectura del pipe de entrada
+        close(pipes[i].pipe_in[0]);
+        //Cerramos el final de escritura del pipe de salida
+        close(pipes[i].pipe_out[1]);
+    }
+
+    freeQueue(files);
 
     //desvincularse a la memoria y liberarla
     clear_shared_memory(shm_ptr, mem_info);
 
-}
-
-void enqueue_args(Queue * files, int argc, char ** argv){
-        // creamos la estructura stat
-    struct stat path_stat;
-    // creamos la cola que va a contener a los files
-    for(int i=1; i<argc; i++){
-        char * filename = malloc(sizeof(char)*strlen(argv[i]));
-        strcpy(filename,argv[i]);
-        // la inicializamos por cada argumento
-        stat(filename, &path_stat);
-        // usamos la macro para ver si es una file
-        if(S_ISREG(path_stat.st_mode)){
-            // si es una file es facil, la encolamos
-            enqueue(files ,&filename);
-        }
-        // usamos otra macro para ver si es un directorio
-        else if(S_ISDIR(path_stat.st_mode)){
-            // si es un dir vemos todas las files adentro
-            DIR * dir;
-            struct dirent * ent;
-            dir = opendir(filename);
-            while((ent = readdir(dir)) != NULL){
-                char * name = malloc(sizeof(char)*strlen(ent->d_name)
-                +sizeof(char)*strlen(filename));
-
-                // aca armamos el path relativo
-                strcpy(name,filename);
-                strcat(name,"/");
-                strcat(name,ent->d_name);
-
-                stat(name, &path_stat);
-                if(S_ISREG(path_stat.st_mode))
-                    enqueue(files, &name);
-            }
-        }
-        else{
-            // si no es directorio o file nos vamos
-            exit(1);
-        }
-    }
-    char  * aux;
-    while(getQueueSize(files)!=0){
-        dequeue(files, &aux);
-        printf("%s\n", aux);
-    }
 }
