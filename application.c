@@ -82,7 +82,6 @@ int main(int argc, char ** argv){
         for(int i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
             char * hash = read_pipe(pipes[i].pipe_in);
             if(hash != NULL){
-
                 //Imprimo el hash TEMPORALMENTE hasta ver lo de la shm
                 //printf("%s\n", hash);
                 //------

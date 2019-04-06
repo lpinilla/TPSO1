@@ -53,18 +53,22 @@ void mem_disconnect(void * ptr_shm, shm_info mem_info){
 	//close?
 }
 
-void check_pid(){
+void check_pid(int argc, char ** argv){
 	char app_pid_read[6];
 	int app_pid = 0;
-	read(STDIN_FILENO, app_pid_read, 6 * sizeof(char));	
-	app_pid_read[5] = 0;
-	app_pid = atoi(app_pid_read);
-	if(app_pid_read == NULL){
-		printf("application's pid must be given\n");
-		exit(EXIT_FAILURE);
+	if(argc < 2){
+		read(STDIN_FILENO, app_pid_read, 6 * sizeof(char));	
+		app_pid_read[5] = 0;
+		app_pid = atoi(app_pid_read);
+		if(app_pid_read == NULL){
+			printf("application's pid must be given\n");
+			exit(EXIT_FAILURE);
+		}
+	}else{
+		app_pid = atoi(argv[1]);		
 	}
 	if( kill(app_pid, 0) < 0 ){
-		printf("Application is not running, exiting \n");
-		exit(EXIT_FAILURE);
+			printf("Application is not running, exiting \n");
+			exit(EXIT_FAILURE);
 	}
 }

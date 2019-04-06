@@ -68,9 +68,9 @@ void shared_memory_test(){
 
 void save_buffer_to_file_test(){
     int n_of_files = 2, ret = 0;
-    char * strings = (char *) malloc((2 * HASH_LENGTH) + sizeof(t_shm_info));
-    char cmd_ret = 0, buff[HASH_LENGTH * 2];
-    memset(strings, 0, (2 * HASH_LENGTH) + sizeof(t_shm_info));
+    char * strings = (char *) malloc((2 * HASH_NAME_SIZE) + sizeof(t_shm_info));
+    char cmd_ret = 0, buff[HASH_NAME_SIZE * 2];
+    memset(strings, 0, (2 * HASH_NAME_SIZE) + sizeof(t_shm_info));
     strcpy(strings + sizeof(t_shm_info), "hello");
     strcpy(strings + sizeof(t_shm_info) + HASH_LENGTH, "world!");
     save_buffer_to_file(strings, n_of_files);
@@ -81,7 +81,7 @@ void save_buffer_to_file_test(){
     ret = strcmp(buff, strings + sizeof(t_shm_info));
     // cppcheck-suppress invalidscanf
     fscanf(file, "%s", buff + HASH_LENGTH);
-    ret += strcmp(buff + HASH_LENGTH, strings + HASH_LENGTH + sizeof(t_shm_info));
+    ret += strcmp(buff + HASH_NAME_SIZE, strings + HASH_NAME_SIZE + sizeof(t_shm_info));
     //liberar memoria
     free(strings);
     //borrar archivo

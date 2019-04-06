@@ -47,14 +47,15 @@ void clear_shared_memory(void * shm_ptr, shm_info mem_info){
 }
 
 void save_buffer_to_file(void * shm_ptr, int n_of_files){
-    FILE * file = fopen("result.txt", "w+");
+    FILE * file = fopen("result.txt", "w+a+");
     for(int i = 0; i < n_of_files;i++){
-        fprintf(file, "%s \n", (char *) (shm_ptr + sizeof(t_shm_info) + i * HASH_NAME_SIZE));
+        fprintf(file, "%s \n", (char *) (shm_ptr + sizeof(t_shm_info)) + i * HASH_NAME_SIZE);
     }
     fclose(file);
 }
 
 void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){   
+    //avisar que hay algo escrito
     if( sem_post(&mem_info->semaphore) < 0){
         perror("Error in wait");
         clear_shared_memory(shm_ptr, mem_info);
@@ -64,8 +65,6 @@ void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){
     strcpy((char *) shm_ptr + mem_info->offset, hash);
     //desplazarse
     mem_info->offset += HASH_NAME_SIZE;
-    //avisar que hay algo escrito
-    
 }
 
 // funcion interna recursiva para encolar archivos y directorios 

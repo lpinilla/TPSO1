@@ -45,7 +45,6 @@ void app_vision_integration_test(){
     call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
     write_hash_to_shm(shm_ptr, mem_info, buff);
     mem_info->has_finished = 1; //se terminaron los archivos
-    printf("%d \n", mypid);
     //cerrando stdout
     close(STDOUT_FILENO);
     dup(fd[1]);
@@ -80,7 +79,7 @@ void app_vision_integration_test(){
     free(buff);
     assert_true(!strncmp(buffer,
                         "dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n",
-                        HASH_NAME_SIZE));
+                        strlen("dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n")));
 }
 
 void ejemplo_profe(){
@@ -143,7 +142,6 @@ void write_and_read_continuous_test(){
   memset(buff, 0, 256 * sizeof(char)); //limpiar todo el buffer
   call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
   write_hash_to_shm(shm_ptr, mem_info, buff);
-  printf("%d \n", mypid);
   //cerrando stdout
   close(STDOUT_FILENO);
   dup(fd[1]);
@@ -178,7 +176,7 @@ void write_and_read_continuous_test(){
   close(fd[0]);
   //comparar
   aux = strcmp("dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n", buffer[0]);
-  aux += strcmp("d9ef87b76ded9d5724be49eadc210552  ../README.md\n", buffer[1]);
+  aux += strcmp(buffer[1], " \nd9ef87b76ded9d5724be49eadc210552  ../README.md");
   //limpiar y liberar memorias
   clear_shared_memory(shm_ptr, mem_info);
   free(str);
@@ -213,7 +211,6 @@ void multiple_write_with_sleep(){
       perror("pipe");
       exit(EXIT_FAILURE);
   }
-  printf("%d \n", mypid);
   //cerrando stdout
   close(STDOUT_FILENO);
   dup(fd[1]);
@@ -248,11 +245,11 @@ void multiple_write_with_sleep(){
   mem_info->has_finished = 1;
   waitpid(cpid, NULL, 0);
   read(fd[0], output[0], 73 * sizeof(char));
-  read(fd[0], output[1], 47 * sizeof(char));
-  read(fd[0], output[2], 53 * sizeof(char));
-  aux = strcmp(output[0], "dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n");
-  aux += strcmp(output[1], "d9ef87b76ded9d5724be49eadc210552  ../README.md\n");
-  aux += strcmp(output[2], "807a23aca22344e4426f1f73eb2c0109  ./hashing_file.txt\n");
+  read(fd[0], output[1], 48 * sizeof(char));
+  read(fd[0], output[2], 55 * sizeof(char));
+  aux =  strcmp(output[0],  "dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n");  
+  aux += strcmp(output[1], " \nd9ef87b76ded9d5724be49eadc210552  ../README.md");  
+  aux += strcmp(output[2], "\n \n807a23aca22344e4426f1f73eb2c0109  ./hashing_file.txt");
   //limpiar la memoria
   clear_shared_memory(shm_ptr, mem_info);
   free(str);
