@@ -5,11 +5,11 @@ int main(int argc, char ** argv){
     if(argc==0 || argc == 1){
         return 1;
     }
-
     //imprimir el pid para vision
     printf("%d \n", getpid());
-
-    sleep(5);
+    void * shm_ptr = create_shared_memory();
+    shm_info mem_info = initialize_shared_memory(shm_ptr);
+    sleep(7);
 
     Queue * files = newQueue();
     queueInit(files, sizeof(char*));
@@ -21,8 +21,7 @@ int main(int argc, char ** argv){
     
     
 
-    void * shm_ptr = create_shared_memory();
-    shm_info mem_info = initialize_shared_memory(shm_ptr);
+    
 
     pipes_info pipes[NUMBER_OF_SLAVES];
 

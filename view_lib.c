@@ -3,6 +3,7 @@
 void print_hashes(void * hash_start, shm_info mem_info){
 	size_t read_offset = sizeof(t_shm_info);
 	while( !mem_info->has_finished || (read_offset != mem_info->offset) ){
+		//esperar al semáforo
 		if( sem_wait(&mem_info->semaphore)){
 			printf("error\n");
 			printf("%s\n", strerror(errno));
@@ -11,7 +12,6 @@ void print_hashes(void * hash_start, shm_info mem_info){
 		}
 		printf("%s \n", (char *) hash_start + read_offset);
 		read_offset += HASH_NAME_SIZE;
-		//avisar que ya leímos todo lo que podíamos	
 	}
 }
 
@@ -38,7 +38,7 @@ void * mapping_shm(void *addr, int prot, int flags,int fd, off_t offset){
 void * connect_to_shm(shm_info * mem_info){
 	//agarrar el file descriptor de la shared memory
 	int fd_shm = open_shm(SHM_NAME, O_RDWR, S_IRWXU); // S_IRWXU is equivalent to ‘(S_IRUSR | S_IWUSR | S_IXUSR)’.
-	//mapeo la memoria con su actual size
+	//mapeo la memoria con su actual size	
     void * ptr_shm = mapping_shm(NULL, PROT_READ | PROT_WRITE, MAP_SHARED,fd_shm,0);
 	*mem_info = (shm_info) ptr_shm;	
 	return ptr_shm;
