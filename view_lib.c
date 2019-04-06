@@ -9,10 +9,9 @@ void print_hashes(void * hash_start, shm_info mem_info){
 			mem_disconnect(hash_start, mem_info);
 			exit(EXIT_FAILURE);
 		}
-		printf("%s", (char *) hash_start + read_offset); //el hash ya tiene un \n
+		printf("%s \n", (char *) hash_start + read_offset);
 		read_offset += HASH_NAME_SIZE;
-		//avisar que ya leímos todo lo que podíamos
-		
+		//avisar que ya leímos todo lo que podíamos	
 	}
 }
 
@@ -54,13 +53,15 @@ void mem_disconnect(void * ptr_shm, shm_info mem_info){
 	//close?
 }
 
-void check_arguments(int argc, char ** argv){
+void check_pid(){
+	char app_pid_read[6];
 	int app_pid = 0;
-	if(argc < 2){
+	read(STDIN_FILENO, app_pid_read, 6 * sizeof(char));	
+	app_pid_read[5] = 0;
+	app_pid = atoi(app_pid_read);
+	if(app_pid_read == NULL){
 		printf("application's pid must be given\n");
 		exit(EXIT_FAILURE);
-	}else{
-		app_pid = atoi(argv[1]);
 	}
 	if( kill(app_pid, 0) < 0 ){
 		printf("Application is not running, exiting \n");

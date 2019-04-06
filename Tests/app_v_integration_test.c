@@ -45,7 +45,7 @@ void app_vision_integration_test(){
     call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
     write_hash_to_shm(shm_ptr, mem_info, buff);
     mem_info->has_finished = 1; //se terminaron los archivos
-
+    printf("%d \n", mypid);
     //cerrando stdout
     close(STDOUT_FILENO);
     dup(fd[1]);
@@ -143,7 +143,7 @@ void write_and_read_continuous_test(){
   memset(buff, 0, 256 * sizeof(char)); //limpiar todo el buffer
   call_command("md5sum ../Sistemas_Operativos_TP1_Q1_2019.pdf", buff);
   write_hash_to_shm(shm_ptr, mem_info, buff);
-  
+  printf("%d \n", mypid);
   //cerrando stdout
   close(STDOUT_FILENO);
   dup(fd[1]);
@@ -213,7 +213,7 @@ void multiple_write_with_sleep(){
       perror("pipe");
       exit(EXIT_FAILURE);
   }
-
+  printf("%d \n", mypid);
   //cerrando stdout
   close(STDOUT_FILENO);
   dup(fd[1]);

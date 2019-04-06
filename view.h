@@ -37,6 +37,6 @@ void * connect_to_shm(shm_info * mem_info);
 void mem_disconnect(void * ptr_shm, shm_info mem_info);
 
 //función para verificar la cantidad de argumentos de vision
-void check_arguments(int argc, char ** argv);
+void check_pid();
 
 #endif

@@ -1,7 +1,7 @@
 #include "view.h"
 
 int main(int argc, char ** argv){
-	check_arguments(argc, argv);	
+	check_pid();	
 	shm_info mem_info = NULL;
 	//int n_of_files = 2; //no es necesario
 	void * ptr_shm = connect_to_shm(&mem_info);

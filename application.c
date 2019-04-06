@@ -6,6 +6,11 @@ int main(int argc, char ** argv){
         return 1;
     }
 
+    //imprimir el pid para vision
+    printf("%d \n", getpid());
+
+    sleep(5);
+
     Queue * files = newQueue();
     queueInit(files, sizeof(char*));
     enqueue_args(files, argc, argv);
@@ -14,8 +19,7 @@ int main(int argc, char ** argv){
     // se puede borrar despues(lo uso para probar save_buffer_to_file al final)
     int aux = files_number;
     
-    //imprimir el pid para vision
-    //printf("%d", getpid());
+    
 
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
@@ -80,7 +84,7 @@ int main(int argc, char ** argv){
             if(hash != NULL){
 
                 //Imprimo el hash TEMPORALMENTE hasta ver lo de la shm
-                printf("%s\n", hash);
+                //printf("%s\n", hash);
                 //------
 
                 files_number--;
@@ -95,12 +99,11 @@ int main(int argc, char ** argv){
             }
         }
     }
-
+    mem_info->has_finished = 1;
     close_pipes(pipes);
 
     freeQueue(files);
 
-    //esto esta funcionando mal
     save_buffer_to_file(shm_ptr, aux);
 
     //desvincularse a la memoria y liberarla
