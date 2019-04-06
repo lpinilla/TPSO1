@@ -49,7 +49,7 @@ void clear_shared_memory(void * shm_ptr, shm_info mem_info){
 void save_buffer_to_file(void * shm_ptr, int n_of_files){
     FILE * file = fopen("result.txt", "w+");
     for(int i = 0; i < n_of_files;i++){
-        fprintf(file, "%s \n", (char *) (shm_ptr + sizeof(t_shm_info)) + i * HASH_LENGTH);
+        fprintf(file, "%s \n", (char *) (shm_ptr + sizeof(t_shm_info) + i * HASH_NAME_SIZE));
     }
     fclose(file);
 }
@@ -130,13 +130,23 @@ char * read_pipe(int pipe[2]){
     msg[i++] = c;
     while(read(pipe[0], &c, 1) > 0 && c != 0){
         if(i%BLOCK==0){
-            msg = realloc(msg, i + BLOCK);
+            char * aux = msg;
+            msg = realloc(aux, i + BLOCK);
+            if(msg == NULL){
+                perror("Error of memory.");
+                exit(EXIT_FAILURE);
+            }
         }
         msg[i++] = c;
     }
 
     if(i%BLOCK==0){
-        msg = realloc(msg, i + 1);
+        char * aux = msg;
+        msg = realloc(aux, i + 1);
+        if(msg == NULL){
+            perror("Error of memory.");
+            exit(EXIT_FAILURE);
+        }
     }
     msg[i] = 0;
     return msg;
