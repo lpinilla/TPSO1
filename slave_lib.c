@@ -1,6 +1,4 @@
 #include "slave.h"
-#include <ctype.h>
-
 
 #define PATH_LEN 256
 #define MD5_LEN 32

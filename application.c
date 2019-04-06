@@ -1,7 +1,4 @@
 #include "application.h"
-#include <dirent.h> 
-#include <stdio.h> 
-#include <string.h>
 
 int main(int argc, char ** argv){
     // si no tenemos argumentos no hay nada que hacer
@@ -13,38 +10,33 @@ int main(int argc, char ** argv){
     queueInit(files, sizeof(char*));
     enqueue_args(files, argc, argv);
     int files_number = getQueueSize(files);
+
+    // se puede borrar despues(lo uso para probar save_buffer_to_file al final)
+    int aux = files_number;
     
     //imprimir el pid para vision
     //printf("%d", getpid());
-    //int n_of_files = 1;
+
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
-    //printf("%p \n", mem_info); //para que me deje compilar
 
-    pipes_type pipes[NUMBER_OF_SLAVES];
+    pipes_info pipes[NUMBER_OF_SLAVES];
 
-    // abrimos todos los pipes
-    for(int i=0; i<NUMBER_OF_SLAVES; i++){
-        if(pipe(pipes[i].pipe_out)==-1){
-            fprintf(stderr, "Error: Pipe creation failed." );
-            return 1;
-        }
-        //fcntl(pipes[i].pipe_out[0], F_SETFL, O_NONBLOCK);
-        if(pipe(pipes[i].pipe_in)==-1){
-            fprintf(stderr, "Error: Pipe creation failed." );
-            return 1;
-        }
-       // fcntl(pipes[i].pipe_in[0], F_SETFL, O_NONBLOCK);
+    if(open_pipes(pipes) == -1){
+        perror("Error: Pipe creation failed.");
+        clear_shared_memory(shm_ptr, mem_info);
+        exit(EXIT_FAILURE);
     }
 
     int p;
 
-    // el padre de por si cierra su stdout
+    // padre crea procesos esclavos y les envia trabajo
     for(int i=0; i<NUMBER_OF_SLAVES && getQueueSize(files)>0 ; i++){
         p=fork();
         if(p<0){
-            fprintf(stderr, "Error: Fork failed." );
-            return 1;
+            perror("Error: Fork failed.");
+            clear_shared_memory(shm_ptr, mem_info);
+            exit(EXIT_FAILURE);
         }
 
         //Proceso hijo/esclavo
@@ -104,18 +96,12 @@ int main(int argc, char ** argv){
         }
     }
 
-    //Proceso padre envia un 0 por los pipes a los hijos para indicarles que terminen su proceso
-    char exit_msg = 0;
-    for(int i=0; i<NUMBER_OF_SLAVES;i++){
-        write(pipes[i].pipe_out[1], &exit_msg, 1);
-
-        //Cerramos el final de lectura del pipe de entrada
-        close(pipes[i].pipe_in[0]);
-        //Cerramos el final de escritura del pipe de salida
-        close(pipes[i].pipe_out[1]);
-    }
+    close_pipes(pipes);
 
     freeQueue(files);
+
+    //esto esta funcionando mal
+    save_buffer_to_file(shm_ptr, aux);
 
     //desvincularse a la memoria y liberarla
     clear_shared_memory(shm_ptr, mem_info);

@@ -68,69 +68,40 @@ void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){
     
 }
 
-/*void enqueue_dir(Queue * files, char * path)
-{
-  DIR * d = opendir(path); // open the path
-  if(d==NULL) return; // if was not able return
-  struct dirent * dir; // for the directory entries
-  while ((dir = readdir(d)) != NULL) // if we were able to read somehting from the directory
-    {
-        char d_path[strlen(path) + strlen(dir->d_name) + 2];
-        sprintf(d_path, "%s/%s", path, dir->d_name);
-      if(dir-> d_type != DT_DIR){ // if the type is not directory just print it with blue
-        enqueue(files, &d_path); // recall with the new path
-      }
-      else if(dir -> d_type == DT_DIR && strcmp(dir->d_name,".")!=0 && strcmp(dir->d_name,"..")!=0 ) // if it is a directory
-      {
-        enqueue_dir(files, d_path); // recall with the new path
-      }
-    }
-    closedir(d); // finally close the directory
-}*/
-
-void enqueue_args(Queue * files, int argc, char ** argv){
-    // creamos la estructura stat
-    struct stat path_stat;
-    // creamos la cola que va a contener a los files
-    for(int i=1; i<argc; i++){
-        char * filename = malloc(sizeof(char)*strlen(argv[i]));
-        strcpy(filename,argv[i]);
-        // la inicializamos por cada argumento
-        stat(filename, &path_stat);
+// funcion interna recursiva para encolar archivos y directorios 
+void enqueue_rec(Queue * files, char * file_name){
+        struct stat path_stat;
+        stat(file_name, &path_stat);
         // usamos la macro para ver si es una file
         if(S_ISREG(path_stat.st_mode)){
             // si es una file es facil, la encolamos
-            enqueue(files ,&filename);
+            enqueue(files ,&file_name);
         }
         // usamos otra macro para ver si es un directorio
         else if(S_ISDIR(path_stat.st_mode)){
-            /*char fname[strlen(filename) + 1];
-            strcpy(fname, filename);
-            free(filename);
-            enqueue_dir(files, fname);*/
-
             // si es un dir vemos todas las files adentro
             DIR * dir;
             struct dirent * ent;
-            dir = opendir(filename);
+            dir = opendir(file_name);
             while((ent = readdir(dir)) != NULL){
-                char * name = malloc(sizeof(char)*strlen(ent->d_name)
-                +sizeof(char)*strlen(filename));
-
-                // aca armamos el path relativo
-                strcpy(name,filename);
-                strcat(name,"/");
-                strcat(name,ent->d_name);
-
-                stat(name, &path_stat);
-                if(S_ISREG(path_stat.st_mode))
-                    enqueue(files, &name);
+                if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, "..")){
+                    char * new_file_name = malloc(strlen(ent->d_name) + strlen(file_name) + 1);
+                    // agrego al nuevo path
+                    sprintf(new_file_name, "%s/%s", file_name, ent->d_name);
+                    // llamamos con el nuevo path
+                    enqueue_rec(files, new_file_name);
+                }
             }
+            free(file_name);
+            closedir(dir);
         }
-        else{
-            // si no es directorio o file nos vamos
-            exit(1);
-        }
+}
+
+void enqueue_args(Queue * files, int argc, char ** argv){
+    for(int i=1; i<argc; i++){
+        char * file_name = malloc(strlen(argv[i]) + 1);
+        strcpy(file_name,argv[i]);
+        enqueue_rec(files, file_name);
     }
 }
 
@@ -147,28 +118,49 @@ void load_file(char * file_name, int pipe[2]){
 }
 
 char * read_pipe(int pipe[2]){
-    int index = 0;
-    int size = BLOCK;
-    char * msg = malloc(BLOCK);
-    char buf;
-    if(!(read(pipe[0], &buf, 1) > 0)){
-        free(msg);
+    int i = 0;
+    char * msg;
+    char c;
+
+    if(!(read(pipe[0], &c, 1) > 0)){
         return NULL;
     }
-
-    msg[index++]=buf;
-
-    while(buf != 0){
-        if(read(pipe[0], &buf, 1) > 0){
-            if(index +1 == size){
-                msg = realloc(msg, size + BLOCK);
-                size += BLOCK;
-            }
-            msg[index++] = buf;
+    
+    msg = malloc(BLOCK);
+    msg[i++] = c;
+    while(read(pipe[0], &c, 1) > 0 && c != 0){
+        if(i%BLOCK==0){
+            msg = realloc(msg, i + BLOCK);
         }
+        msg[i++] = c;
     }
 
-    msg = realloc(msg, index+2);
-    msg[index] = 0;
+    if(i%BLOCK==0){
+        msg = realloc(msg, i + 1);
+    }
+    msg[i] = 0;
     return msg;
+}
+
+int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
+    // abrimos todos los pipes
+    for(int i=0; i<NUMBER_OF_SLAVES; i++){
+        if(pipe(pipes[i].pipe_out)==-1 || pipe(pipes[i].pipe_in)==-1){
+            return -1;
+        }
+    }
+    return 0;
+}
+
+void close_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
+    //Proceso padre envia un 0 por los pipes a los hijos para indicarles que terminen su proceso
+    char exit_msg = 0;
+    for(int i=0; i<NUMBER_OF_SLAVES;i++){
+        write(pipes[i].pipe_out[1], &exit_msg, 1);
+
+        //Cerramos el final de lectura del pipe de entrada
+        close(pipes[i].pipe_in[0]);
+        //Cerramos el final de escritura del pipe de salida
+        close(pipes[i].pipe_out[1]);
+    }
 }

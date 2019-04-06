@@ -11,3 +11,7 @@ Tests/*.so
 ## carpetas ocultas
 
 .*
+
+## resultado del programa
+
+result.txt

@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 /*función para calcular el hash md5 en base a un archivo retorna 'hash nombredel archivo'*/
 int call_md5(char * file_name, char * output);

@@ -19,13 +19,13 @@
 
 #define SHM_NAME "/shm"
 #define NUMBER_OF_SLAVES 5
-#define BLOCK 10
+#define BLOCK 8
 #define HASH_LENGTH 32
 
 typedef struct{
   int pipe_out[2];
   int pipe_in[2];
-} pipes_type;
+} pipes_info;
 
 typedef struct{
     //offset al último elemento agregado
@@ -61,12 +61,17 @@ void enqueue_args(Queue * files, int argc, char ** argv);
 //envia un archivo al pipe pasado
 void send_file(Queue * files, int pipe_out[2]);
 
-//Recibe el mensaje con el archivo y la pipe de entrada para enviar al padre
+//recibe el mensaje con el archivo y la pipe de entrada para enviar al padre
 void load_file(char * file_name, int pipe[2]);
 
-//Lee un mensaje del pipe hasta encontrar un caracter 0 y lo retorna
+//lee un mensaje del pipe hasta encontrar un caracter 0 y lo retorna
 char * read_pipe(int pipe[2]);
 
+//abre todos los pipes desde el proceso padre
+int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]);
+
+//envia mensaje para terminar procesos hijos y cierra pipes desde el padre
+void close_pipes(pipes_info pipes[NUMBER_OF_SLAVES]);
 
 #endif
 
