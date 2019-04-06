@@ -31,10 +31,11 @@ int main(int argc, char ** argv){
         exit(EXIT_FAILURE);
     }
 
+    int i;
     int p;
 
     // padre crea procesos esclavos y les envia trabajo
-    for(int i=0; i<NUMBER_OF_SLAVES && getQueueSize(files)>0 ; i++){
+    for(i=0; i<NUMBER_OF_SLAVES && getQueueSize(files)>0 ; i++){
         p=fork();
         if(p<0){
             perror("Error: Fork failed.");
@@ -78,7 +79,7 @@ int main(int argc, char ** argv){
 
     // el padre recibe los hashes, los guarda en la shm y si quedan archivos por enviar a esclavos los envia
     while(files_number>0){
-        for(int i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
+        for(i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
             char * hash = read_pipe(pipes[i].pipe_in);
             if(hash != NULL){
                 //Imprimo el hash TEMPORALMENTE hasta ver lo de la shm
@@ -106,5 +107,6 @@ int main(int argc, char ** argv){
 
     //desvincularse a la memoria y liberarla
     clear_shared_memory(shm_ptr, mem_info);
-
+    
+    return 0;
 }

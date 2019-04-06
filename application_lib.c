@@ -48,7 +48,8 @@ void clear_shared_memory(void * shm_ptr, shm_info mem_info){
 
 void save_buffer_to_file(void * shm_ptr, int n_of_files){
     FILE * file = fopen("result.txt", "w+a+");
-    for(int i = 0; i < n_of_files;i++){
+    int i;
+    for(i = 0; i < n_of_files;i++){
         fprintf(file, "%s \n", (char *) (shm_ptr + sizeof(t_shm_info)) + i * HASH_NAME_SIZE);
     }
     fclose(file);
@@ -97,7 +98,8 @@ void enqueue_rec(Queue * files, char * file_name){
 }
 
 void enqueue_args(Queue * files, int argc, char ** argv){
-    for(int i=1; i<argc; i++){
+    int i;
+    for(i=1; i<argc; i++){
         char * file_name = malloc(strlen(argv[i]) + 1);
         strcpy(file_name,argv[i]);
         enqueue_rec(files, file_name);
@@ -153,7 +155,8 @@ char * read_pipe(int pipe[2]){
 
 int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
     // abrimos todos los pipes
-    for(int i=0; i<NUMBER_OF_SLAVES; i++){
+    int i;
+    for(i=0; i<NUMBER_OF_SLAVES; i++){
         if(pipe(pipes[i].pipe_out)==-1 || pipe(pipes[i].pipe_in)==-1){
             return -1;
         }
@@ -164,7 +167,8 @@ int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
 void close_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
     //Proceso padre envia un 0 por los pipes a los hijos para indicarles que terminen su proceso
     char exit_msg = 0;
-    for(int i=0; i<NUMBER_OF_SLAVES;i++){
+    int i;
+    for(i=0; i<NUMBER_OF_SLAVES;i++){
         write(pipes[i].pipe_out[1], &exit_msg, 1);
 
         //Cerramos el final de lectura del pipe de entrada
