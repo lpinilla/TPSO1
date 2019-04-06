@@ -49,7 +49,7 @@ void clear_shared_memory(void * shm_ptr, shm_info mem_info){
 void save_buffer_to_file(void * shm_ptr, int n_of_files){
     FILE * file = fopen("result.txt", "w+");
     for(int i = 0; i < n_of_files;i++){
-        fprintf(file, "%s \n", (char *) shm_ptr + i * HASH_LENGTH);
+        fprintf(file, "%s \n", (char *) (shm_ptr + sizeof(t_shm_info)) + i * HASH_LENGTH);
     }
     fclose(file);
 }
