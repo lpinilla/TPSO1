@@ -2,9 +2,16 @@
 
 void print_hashes(void * hash_start, shm_info mem_info){
 	size_t read_offset = sizeof(t_shm_info);
+	struct timespec ts;
+	if(clock_gettime(CLOCK_REALTIME, &ts) == -1){
+		perror("clock error");
+		mem_disconnect(hash_start, mem_info);
+		exit(EXIT_FAILURE);
+	}
+	ts.tv_sec += 5; //limite del semáforo de 5 segundos
 	while( !mem_info->has_finished || (read_offset != mem_info->offset) ){
 		//esperar al semáforo
-		if( sem_wait(&mem_info->semaphore)){
+		if( sem_timedwait(&mem_info->semaphore, &ts)){
 			printf("error\n");
 			printf("%s\n", strerror(errno));
 			mem_disconnect(hash_start, mem_info);
@@ -53,15 +60,15 @@ void mem_disconnect(void * ptr_shm, shm_info mem_info){
 	//close?
 }
 
-void check_pid(int argc, char ** argv){
-	char app_pid_read[6];
+void check_pid(int argc, char ** argv){	
 	int app_pid = 0;
 	if(argc < 2){
+		char app_pid_read[6];
 		read(STDIN_FILENO, app_pid_read, 6 * sizeof(char));	
 		app_pid_read[5] = 0;
 		app_pid = atoi(app_pid_read);
 		if(app_pid_read == NULL){
-			printf("application's pid must be given\n");
+			printf("Application's pid must be given\n");
 			exit(EXIT_FAILURE);
 		}
 	}else{

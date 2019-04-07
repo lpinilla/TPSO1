@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <time.h>
 #include "application.h"
 #include "./utilities/utils.h"
 

@@ -9,7 +9,7 @@ int main(int argc, char ** argv){
     printf("%d \n", getpid());
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
-    sleep(7);
+    sleep(5);
 
     Queue * files = newQueue();
     queueInit(files, sizeof(char*));
@@ -18,10 +18,6 @@ int main(int argc, char ** argv){
 
     // se puede borrar despues(lo uso para probar save_buffer_to_file al final)
     int aux = files_number;
-    
-    
-
-    
 
     pipes_info pipes[NUMBER_OF_SLAVES];
 
