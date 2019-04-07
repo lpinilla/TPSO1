@@ -29,3 +29,9 @@ int call_md5(char *file_name, char *output)
 
     return i == MD5_LEN;
 }
+
+void load_file(char * file_name, int pipe[2]){  
+    char hash_msg[HASH_LENGTH + strlen(file_name) + 3];
+    call_md5(file_name, hash_msg);
+    write(pipe[1], hash_msg, strlen(hash_msg)+1);
+}

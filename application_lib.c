@@ -112,12 +112,6 @@ void send_file(Queue * files, int pipe[2]){
     write(pipe[1], file_name, strlen(file_name)+1);
 }
 
-void load_file(char * file_name, int pipe[2]){  
-    char hash_msg[HASH_LENGTH + strlen(file_name) + 3];
-    call_md5(file_name, hash_msg);
-    write(pipe[1], hash_msg, strlen(hash_msg)+1);
-}
-
 int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
     // abrimos todos los pipes
     int i;
