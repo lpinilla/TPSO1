@@ -49,6 +49,16 @@ int main(int argc, char ** argv){
             close(pipes[i].pipe_out[1]);
             //Cerramos el final de lectura del pipe de entrada
             close(pipes[i].pipe_in[0]);
+            // cerramos stdin
+            close(stdin);
+            // redireccionamos stdin del slave al final de lectura
+            // del pipe de salida
+            dup(pipes[i].pipe_out[0]);
+            //cerramos stdout
+            close(stdout);
+            // redireccionamos stdout del slave al final de escritura
+            // del pipe de entrada
+            dup(pipes[i].pipe_in[1]);
 
             //El hijo entra en ciclo hasta que el padre le indique que cierre
             while(1){
