@@ -59,21 +59,7 @@ int main(int argc, char ** argv){
             // redireccionamos stdout del slave al final de escritura
             // del pipe de entrada
             dup(pipes[i].pipe_in[1]);
-
-            //El hijo entra en ciclo hasta que el padre le indique que cierre
-            while(1){
-                char * msg = read_pipe(pipes[i].pipe_out);
-                if(msg != NULL){
-                    if(*msg == 0){
-                        close(pipes[i].pipe_out[0]);
-                        close(pipes[i].pipe_in[1]);
-                        exit(0);
-                    }else{
-                        load_file(msg, pipes[i].pipe_in);
-                    }
-                    free(msg);
-                }
-            }
+            execv("slave.so", "");
         }
 
         //Proceso padre

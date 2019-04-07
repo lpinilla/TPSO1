@@ -9,6 +9,7 @@ int main(void){
         char * msg = read_pipe(standars);
         if(msg != NULL){
             if(*msg == 0){
+                free(msg);
                 exit(0);
             }else{
                 load_file(msg, standars);
