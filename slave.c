@@ -2,8 +2,8 @@
 
 int main(void){
     int standars[2];
-    standars[0] = stdin;
-    standars[1] = stdout;
+    standars[0] = STDIN_FILENO;
+    standars[1] = STDOUT_FILENO;
     //El hijo entra en ciclo hasta que el padre le indique que cierre
     while(1){
         char * msg = read_pipe(standars);

@@ -50,16 +50,17 @@ int main(int argc, char ** argv){
             //Cerramos el final de lectura del pipe de entrada
             close(pipes[i].pipe_in[0]);
             // cerramos stdin
-            close(stdin);
+            close(STDIN_FILENO);
             // redireccionamos stdin del slave al final de lectura
             // del pipe de salida
             dup(pipes[i].pipe_out[0]);
             //cerramos stdout
-            close(stdout);
+            close(STDOUT_FILENO);
             // redireccionamos stdout del slave al final de escritura
             // del pipe de entrada
             dup(pipes[i].pipe_in[1]);
-            execv("slave.so", "");
+            char ** no_args = {'\0'};
+            execv("slave.so", no_args);
         }
 
         //Proceso padre
