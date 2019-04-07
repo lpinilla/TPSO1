@@ -118,41 +118,6 @@ void load_file(char * file_name, int pipe[2]){
     write(pipe[1], hash_msg, strlen(hash_msg)+1);
 }
 
-char * read_pipe(int pipe[2]){
-    int i = 0;
-    char * msg;
-    char c;
-
-    if(!(read(pipe[0], &c, 1) > 0)){
-        return NULL;
-    }
-    
-    msg = malloc(BLOCK);
-    msg[i++] = c;
-    while(read(pipe[0], &c, 1) > 0 && c != 0){
-        if(i%BLOCK==0){
-            char * aux = msg;
-            msg = realloc(aux, i + BLOCK);
-            if(msg == NULL){
-                perror("Error of memory.");
-                exit(EXIT_FAILURE);
-            }
-        }
-        msg[i++] = c;
-    }
-
-    if(i%BLOCK==0){
-        char * aux = msg;
-        msg = realloc(aux, i + 1);
-        if(msg == NULL){
-            perror("Error of memory.");
-            exit(EXIT_FAILURE);
-        }
-    }
-    msg[i] = 0;
-    return msg;
-}
-
 int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
     // abrimos todos los pipes
     int i;
