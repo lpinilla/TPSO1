@@ -1,4 +1,12 @@
 #include "application.h"
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+
+#define INITIAL_CHARGE 5
 
 int main(int argc, char ** argv){
     // si no tenemos argumentos no hay nada que hacer
@@ -9,7 +17,10 @@ int main(int argc, char ** argv){
     printf("%d \n", getpid());
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
-    sleep(5);
+    // creamos lo necesario para select
+    fd_set read_set;
+    struct timeval tv;
+    FD_ZERO(&read_set);
 
     Queue * files = newQueue();
     queueInit(files, sizeof(char*));
@@ -45,21 +56,18 @@ int main(int argc, char ** argv){
             close(pipes[i].pipe_out[1]);
             //Cerramos el final de lectura del pipe de entrada
             close(pipes[i].pipe_in[0]);
-
-            //El hijo entra en ciclo hasta que el padre le indique que cierre
-            while(1){
-                char * msg = read_pipe(pipes[i].pipe_out);
-                if(msg != NULL){
-                    if(*msg == 0){
-                        close(pipes[i].pipe_out[0]);
-                        close(pipes[i].pipe_in[1]);
-                        exit(0);
-                    }else{
-                        load_file(msg, pipes[i].pipe_in);
-                    }
-                    free(msg);
-                }
-            }
+            // cerramos stdin
+            close(STDIN_FILENO);
+            // redireccionamos stdin del slave al final de lectura
+            // del pipe de salida
+            dup(pipes[i].pipe_out[0]);
+            //cerramos stdout
+            close(STDOUT_FILENO);
+            // redireccionamos stdout del slave al final de escritura
+            // del pipe de entrada
+            dup(pipes[i].pipe_in[1]);
+            char ** no_args = {'\0'};
+            execv("slave.so", no_args);
         }
 
         //Proceso padre
@@ -68,14 +76,51 @@ int main(int argc, char ** argv){
             close(pipes[i].pipe_out[0]);
             //Cerramos el final de escritura del pipe de entrada
             close(pipes[i].pipe_in[1]);
-            //Envia un archivo a cada hijo
-            send_file(files, pipes[i].pipe_out);
         }
     }
 
-    // el padre recibe los hashes, los guarda en la shm y si quedan archivos por enviar a esclavos los envia
-    while(files_number>0){
-        for(i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
+    int j;
+    int actual_files = getQueueSize(files);
+    if(INITIAL_CHARGE*NUMBER_OF_SLAVES <= getQueueSize(files)){
+        for(i=0; i<NUMBER_OF_SLAVES; i++){
+            char initial = INITIAL_CHARGE;
+            write(pipes[i].pipe_out[1],&initial,sizeof(initial));
+            for(j=0; j<INITIAL_CHARGE;j++){
+                send_file(files,pipes[i].pipe_out);
+            }
+        }
+    }
+    else{
+        char initial = 1;
+        for(i=0; i<NUMBER_OF_SLAVES && getQueueSize(files) > 0; i++){
+            write(pipes[i].pipe_out[1],&initial,sizeof(initial));
+            send_file(files,pipes[i].pipe_out);
+        }
+    }
+    while(actual_files>0){
+        tv.tv_sec=10;
+        tv.tv_usec=0;
+        for(int i=0; i<NUMBER_OF_SLAVES;i++){
+            FD_SET(pipes[i].pipe_in[0],&read_set);
+        }
+        if(select(pipes[NUMBER_OF_SLAVES-1].pipe_in[1]+1,&read_set,NULL,NULL,&tv)<0){
+            perror("ERROR EN SELECT \n");
+            exit(EXIT_SUCCESS);
+        }
+        for(i=0; i<NUMBER_OF_SLAVES && actual_files>0; i++){
+            if(FD_ISSET(pipes[i].pipe_in[0],&read_set)){
+                char * hash = read_pipe(pipes[i].pipe_in);
+                actual_files--;
+                if(hash != NULL){
+                    write_hash_to_shm(shm_ptr, mem_info, hash);
+                    free(hash);
+                }
+                FD_SET(pipes[i].pipe_in[0],&read_set);
+                if(getQueueSize(files)>0)
+                    send_file(files,pipes[i].pipe_out);
+            }
+            /*
+            send_file(files, pipes[i].pipe_out);
             char * hash = read_pipe(pipes[i].pipe_in);
             if(hash != NULL){
                 //Imprimo el hash TEMPORALMENTE hasta ver lo de la shm
@@ -86,12 +131,9 @@ int main(int argc, char ** argv){
 
                 //Guarda hash en la shm
                 write_hash_to_shm(shm_ptr, mem_info, hash);
-
-                if(getQueueSize(files)>0){
-                    send_file(files, pipes[i].pipe_out);
-                }
                 free(hash);
             }
+            */
         }
     }
     mem_info->has_finished = 1;

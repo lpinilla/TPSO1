@@ -24,3 +24,37 @@ off_t inline calculate_size(int n_of_files){ //hacer macro
     return (n_of_files * ((MAX_FILE_NAME + HASH_LENGTH + AUX_HASH_CHARS) * sizeof(char)) + sizeof(t_shm_info));
 }
 
+char * read_pipe(int pipe[2]){
+    int i = 0;
+    char * msg;
+    char c;
+
+    if(!(read(pipe[0], &c, 1) > 0)){
+        return NULL;
+    }
+    
+    msg = malloc(BLOCK);
+    msg[i++] = c;
+    while(read(pipe[0], &c, 1) > 0 && c != 0){
+        if(i%BLOCK==0){
+            char * aux = msg;
+            msg = realloc(aux, i + BLOCK);
+            if(msg == NULL){
+                perror("Error of memory.");
+                exit(EXIT_FAILURE);
+            }
+        }
+        msg[i++] = c;
+    }
+
+    if(i%BLOCK==0){
+        char * aux = msg;
+        msg = realloc(aux, i + 1);
+        if(msg == NULL){
+            perror("Error of memory.");
+            exit(EXIT_FAILURE);
+        }
+    }
+    msg[i] = 0;
+    return msg;
+}

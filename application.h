@@ -61,12 +61,6 @@ void enqueue_args(Queue * files, int argc, char ** argv);
 //envia un archivo al pipe pasado
 void send_file(Queue * files, int pipe_out[2]);
 
-//recibe el mensaje con el archivo y la pipe de entrada para enviar al padre
-void load_file(char * file_name, int pipe[2]);
-
-//lee un mensaje del pipe hasta encontrar un caracter 0 y lo retorna
-char * read_pipe(int pipe[2]);
-
 //abre todos los pipes desde el proceso padre
 int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]);
 

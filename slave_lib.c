@@ -8,7 +8,7 @@
 
 int call_md5(char *file_name, char *output)
 {
-    #define MD5SUM_CMD_FMT "md5sum %." STR(PATH_LEN) "s 2>/dev/null"
+    #define MD5SUM_CMD_FMT "md5sum %." STR(PATH_LEN) "s"
     char cmd[PATH_LEN + sizeof (MD5SUM_CMD_FMT)];
     sprintf(cmd, MD5SUM_CMD_FMT, file_name);
     #undef MD5SUM_CMD_FMT
@@ -28,4 +28,10 @@ int call_md5(char *file_name, char *output)
     pclose(p);
 
     return i == MD5_LEN;
+}
+
+void load_file(char * file_name, int pipe[2]){  
+    char hash_msg[HASH_LENGTH + strlen(file_name) + 3];
+    call_md5(file_name, hash_msg);
+    write(pipe[1], hash_msg, strlen(hash_msg)+1);
 }

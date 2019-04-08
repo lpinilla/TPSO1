@@ -3,7 +3,7 @@
 #todos los archivos binarios van a tener extensión .so
 
 #arhivos que tienen un main
-TARGETS = view application
+TARGETS = view application slave
 #arhivos que no tienen un main
 SOURCES = utilities/sources/queue utilities/sources/utils slave_lib application_lib view_lib
 #testing
