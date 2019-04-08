@@ -6,8 +6,9 @@ int main(void){
     standars[1] = STDOUT_FILENO;
     char  initial;
     read(STDIN_FILENO, &initial, sizeof(initial));
+    int i;
     //El hijo entra en ciclo hasta que el padre le indique que cierre
-    for(int i=0; i<initial;i++){
+    for(i=0; i<initial;i++){
         char * msg = read_pipe(standars);
         if(msg!= NULL){
             if(*msg == 0){
