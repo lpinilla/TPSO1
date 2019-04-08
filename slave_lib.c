@@ -28,8 +28,8 @@ void load_file(char * file_name, int pipe[2]){
     write(pipe[1], hash_msg, strlen(hash_msg)+1);
 }
 
-void read_parent_pipe(char * msg, int standards[]){
-     msg = read_pipe(standards);
+void read_parent_pipe(int standards[]){
+     char * msg = read_pipe(standards);
         if(msg != NULL){
             if(*msg == 0){
                 free(msg);
@@ -41,17 +41,17 @@ void read_parent_pipe(char * msg, int standards[]){
         }
 }
 
-void read_initial_files(char initial, char * msg, int standards[]){
+void read_initial_files(char initial, int standards[]){
     for(int i=0; i<initial;i++){
-        read_parent_pipe(msg, standards);
+        read_parent_pipe(standards);
     }
     write(STDOUT_FILENO,"-1",sizeof("-1"));
 }
 
-void read_remaining_files(char initial, char * msg, int standards[]){
+void read_remaining_files(char initial, int standards[]){
     //El hijo entra en ciclo hasta que el padre le indique que cierre
     while(1){
-        read_parent_pipe(msg, standards);
+        read_parent_pipe(standards);
         write(STDOUT_FILENO,"-1",sizeof("-1"));
     }
 }
