@@ -6,7 +6,7 @@ int main(int argc, char ** argv){
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
     fd_set read_set;
-    struct timeval tv;
+    struct timeval tv = {10, 0};
     pipes_info pipes[NUMBER_OF_SLAVES];
     Queue * files = newQueue();
     int total_files_number = 0, aux = 0;

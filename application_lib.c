@@ -111,10 +111,10 @@ void enqueue_args(Queue * files, int argc, char ** argv){
     }
 }
 
-void send_file(Queue * files, int pipe[2]){
+void send_file(Queue * files, int pipe_out[]){
     char * file_name;
     dequeue(files, &file_name);
-    write(pipe[1], file_name, strlen(file_name)+1);
+    write(pipe_out[1], file_name, strlen(file_name)+1);
     free(file_name);
 }
 
@@ -223,6 +223,9 @@ void check_app_arguments(int argc){
 }
 
 void send_remaining_files(int aux, struct timeval tv, pipes_info * pipes, fd_set read_set, void * shm_ptr, shm_info mem_info, Queue * files){
+    char * hash = NULL;
+    // cppcheck-suppress variableScope
+    int maxfd = 0;
     while(aux>0){
         tv.tv_sec=10;
         tv.tv_usec=0;
@@ -230,9 +233,8 @@ void send_remaining_files(int aux, struct timeval tv, pipes_info * pipes, fd_set
         for(int i=0; i<NUMBER_OF_SLAVES;i++){
             FD_SET(pipes[i].pipe_in[0],&read_set);
         }
-        
         //el primer argumento de select debe ser el pipe mas grande de todos + 1, aclarado en libreria de select
-        int maxfd = pipes[0].pipe_in[1];
+        maxfd = pipes[0].pipe_in[1];
         for(int i=1; i<NUMBER_OF_SLAVES;i++){
             if(maxfd < pipes[i].pipe_in[1]){
                 maxfd = pipes[i].pipe_in[1];
@@ -244,12 +246,12 @@ void send_remaining_files(int aux, struct timeval tv, pipes_info * pipes, fd_set
         }
         for(int i=0; i<NUMBER_OF_SLAVES && aux>0; i++){
             if(FD_ISSET(pipes[i].pipe_in[0],&read_set)){
-                char * hash = read_pipe(pipes[i].pipe_in);
+                hash = read_pipe(pipes[i].pipe_in);
                 if(hash != NULL && strcmp(hash,"-1")!=0){
                     aux--;
                     write_hash_to_shm(shm_ptr, mem_info, hash);
                 }
-                else if(getQueueSize(files)>0 && strcmp(hash,"-1")==0){
+                else if(getQueueSize(files)>0 && hash!=NULL && strcmp(hash,"-1")==0){
                     send_file(files,pipes[i].pipe_out);
                 }
                 free(hash);
