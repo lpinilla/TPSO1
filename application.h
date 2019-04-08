@@ -64,7 +64,7 @@ void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash);
 void enqueue_args(Queue * files, int argc, char ** argv);
 
 //envia un archivo al pipe pasado
-void send_file(Queue * files, int pipe_out[2]);
+void send_file(Queue * files, int pipe_out[]);
 
 //abre todos los pipes desde el proceso padre
 int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]);
@@ -77,6 +77,16 @@ void fork_slaves(pipes_info pipes[NUMBER_OF_SLAVES]);
 
 //envia los archivos iniciales a los esclavos
 void send_initial_files(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]);
+
+//función para cerrar todos los recursos del programa
+void terminate_program(shm_info mem_info, pipes_info * pipes, Queue * files, void * shm_ptr, int total_files_number);
+
+//checkear si no pasan argumentos
+void check_app_arguments(int argc);
+
+//función que se encarga de procesar los archivos restantes
+void send_remaining_files(int aux, struct timeval tv, pipes_info * pipes, fd_set read_set, void * shm_ptr, shm_info mem_info, Queue * files);
+
 
 #endif
 

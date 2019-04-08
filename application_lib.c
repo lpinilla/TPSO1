@@ -198,5 +198,62 @@ void send_initial_files(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]){
             write(pipes[i].pipe_out[1],&initial,sizeof(initial));
             send_file(files,pipes[i].pipe_out);
         }
+    }   
+}
+
+void terminate_program(shm_info mem_info, pipes_info * pipes, Queue * files, void * shm_ptr, int total_files_number){
+    mem_info->has_finished = 1;
+
+    close_pipes(pipes);
+
+    freeQueue(files);
+
+    save_buffer_to_file(shm_ptr, total_files_number);
+
+    //desvincularse a la memoria y liberarla
+    clear_shared_memory(shm_ptr, mem_info);
+}
+
+void check_app_arguments(int argc){
+    // si no tenemos argumentos no hay nada que hacer
+    if(argc < 2){
+        printf("No files in arguments \n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void send_remaining_files(int aux, struct timeval tv, pipes_info * pipes, fd_set read_set, void * shm_ptr, shm_info mem_info, Queue * files){
+    while(aux>0){
+        tv.tv_sec=10;
+        tv.tv_usec=0;
+        
+        for(int i=0; i<NUMBER_OF_SLAVES;i++){
+            FD_SET(pipes[i].pipe_in[0],&read_set);
+        }
+        
+        //el primer argumento de select debe ser el pipe mas grande de todos + 1, aclarado en libreria de select
+        int maxfd = pipes[0].pipe_in[1];
+        for(int i=1; i<NUMBER_OF_SLAVES;i++){
+            if(maxfd < pipes[i].pipe_in[1]){
+                maxfd = pipes[i].pipe_in[1];
+            }
+        }
+        if(select(maxfd+1, &read_set, NULL, NULL, &tv) < 0){
+            perror("Error: Select failed.\n");
+            exit(EXIT_FAILURE);
+        }
+        for(int i=0; i<NUMBER_OF_SLAVES && aux>0; i++){
+            if(FD_ISSET(pipes[i].pipe_in[0],&read_set)){
+                char * hash = read_pipe(pipes[i].pipe_in);
+                if(hash != NULL && strcmp(hash,"-1")!=0){
+                    aux--;
+                    write_hash_to_shm(shm_ptr, mem_info, hash);
+                }
+                else if(getQueueSize(files)>0 && strcmp(hash,"-1")==0){
+                    send_file(files,pipes[i].pipe_out);
+                }
+                free(hash);
+            }
+        }
     }
 }

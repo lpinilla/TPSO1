@@ -8,10 +8,10 @@ void print_hashes(void * hash_start, shm_info mem_info){
 		mem_disconnect(hash_start, mem_info);
 		exit(EXIT_FAILURE);
 	}
-	ts.tv_sec += 5; //limite del semáforo de 5 segundos
+	ts.tv_sec += 10; //limite del semáforo de 10 segundos
 	while( !mem_info->has_finished || (read_offset != mem_info->offset) ){
 		//esperar al semáforo
-		if( sem_timedwait(&mem_info->semaphore, &ts)){
+		if( sem_wait(&mem_info->semaphore)){
 			printf("error\n");
 			printf("%s\n", strerror(errno));
 			mem_disconnect(hash_start, mem_info);
@@ -25,7 +25,7 @@ void print_hashes(void * hash_start, shm_info mem_info){
 int open_shm(const char *name, int oflag, mode_t mode){
     int fd_shm = shm_open(name, oflag, mode); 	
 	if (fd_shm == -1) {
-		printf("Error\n");
+		printf("shm_open error: ");
 		printf("%s\n", strerror(errno));
 		exit(EXIT_FAILURE); //exit fail?
 	}
