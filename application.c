@@ -18,7 +18,11 @@ int main(int argc, char ** argv){
     queueInit(files, sizeof(char*));
     enqueue_args(files, argc, argv);
     aux = total_files_number = getQueueSize(files);
-
+    if(total_files_number > SHM_MAX_FILES){
+        perror("Error: Max files shm is 1000.");
+        exit(EXIT_FAILURE);
+    }
+    
     //dormir para que vision se pueda conectar
     sleep(7);   
     fflush(stdout);

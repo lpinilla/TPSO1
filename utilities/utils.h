@@ -13,7 +13,8 @@
 #define HASH_LENGTH 32
 #define AUX_HASH_CHARS 3
 #define HASH_NAME_SIZE ((MAX_FILE_NAME + HASH_LENGTH + AUX_HASH_CHARS) * sizeof(char))
-#define SHM_MAX_SIZE HASH_NAME_SIZE*1000
+#define SHM_MAX_FILES 1000
+#define SHM_MAX_SIZE HASH_NAME_SIZE*SHM_MAX_FILES
 
 //función para llamar a un comando de linux y guardar el resultado en un buffer
 void call_command(char * command, char * buffer);
