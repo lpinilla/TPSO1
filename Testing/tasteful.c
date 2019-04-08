@@ -50,12 +50,13 @@ char ** fetch_all_suites(int n_of_suites_found){
     //simplemente agarrar la salida de grep
     char * buffer = (char *) malloc(MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
     if(buffer == NULL){return NULL;}
-    char ** ret = (char **) malloc(n_of_suites_found);
+    char ** ret = (char **) malloc(n_of_suites_found * sizeof(char *));
     if(ret == NULL){
         free(buffer);
         return NULL;
     }
     memset(buffer, 0x0, MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
+    //agarrar todos los nombres de los archivos
     call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*.so'", buffer);
     //cleaning buffer
     for(int i = 0; i < (MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char) - 1); i++){
@@ -72,7 +73,7 @@ char ** fetch_all_suites(int n_of_suites_found){
             aux++;
             if(buffer[i] == '|'){ //encontramos el nombre de un archivo
                 //printf("aux: %d i: %d\n", aux, i); //testing
-                ret[ret_index] = malloc(aux * sizeof(char));    //hay que liberarlo
+                ret[ret_index] = (char *) malloc(aux * sizeof(char));    //hay que liberarlo
                 if(ret[ret_index] == NULL){
                     printf("Problem allocating space for name\n");
                     free(buffer);
@@ -80,15 +81,16 @@ char ** fetch_all_suites(int n_of_suites_found){
                     return NULL;
                 }
                 strncpy(ret[ret_index], &buffer[i - aux + 1], (size_t) aux - 1);
-                ret[ret_index + aux] = 0;
+                //printf("printing: %s \n", (char *) ret[ret_index]);
+                //ret[ret_index + aux] = 0;
                 aux = 0;
                 ret_index++;
             }
         }
     }
-    //printf("%s \n", buffer);
-    //printf("Testing function:---------\n");
-    /*for(int i = 0; i < n_of_suites_found; i++){
+    /*printf("%s \n", buffer);
+    printf("Testing function:---------\n");
+    for(int i = 0; i < n_of_suites_found; i++){
         printf("%s \n", ret[i]);
     }*/
     //liberar el buffer
