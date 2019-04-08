@@ -85,7 +85,7 @@ void enqueue_rec(Queue * files, char * file_name){
         dir = opendir(file_name);
         while((ent = readdir(dir)) != NULL){
             if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, "..")){
-                char * new_file_name = malloc(strlen(ent->d_name) + strlen(file_name) + 1);
+                char * new_file_name = malloc(strlen(ent->d_name) + strlen(file_name) + 2);
                 // agrego al nuevo path
                 if(file_name[strlen(file_name)] == '/'){
                     sprintf(new_file_name, "%s%s", file_name, ent->d_name);
