@@ -6,6 +6,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <semaphore.h>
+#include <sys/select.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
@@ -21,6 +22,7 @@
 #define NUMBER_OF_SLAVES 5
 #define BLOCK 8
 #define HASH_LENGTH 32
+#define INITIAL_CHARGE 5
 
 typedef struct{
   int pipe_out[2];
@@ -66,6 +68,12 @@ int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]);
 
 //envia mensaje para terminar procesos hijos y cierra pipes desde el padre
 void close_pipes(pipes_info pipes[NUMBER_OF_SLAVES]);
+
+//realiza la creacion de hijos esclavos y deja los pipes listos
+void fork_slaves(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]);
+
+//envia los archivos iniciales a los esclavos
+void send_initial_files(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]);
 
 #endif
 

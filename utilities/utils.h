@@ -21,8 +21,4 @@ void call_command(char * command, char * buffer);
 //lee un mensaje del pipe hasta encontrar un caracter 0 y lo retorna
 char * read_pipe(int pipe[2]);
 
-//función auxiliar para calcular el tamaño de la memoria basado en la cantidad de archivos
-//no la necesitamos mas
-//off_t calculate_size(int n_of_files);
-
 #endif

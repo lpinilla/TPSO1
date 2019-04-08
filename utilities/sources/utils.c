@@ -20,10 +20,6 @@ void call_command(char * command, char * buffer){
     return;
 }
 
-off_t inline calculate_size(int n_of_files){ //hacer macro
-    return (n_of_files * ((MAX_FILE_NAME + HASH_LENGTH + AUX_HASH_CHARS) * sizeof(char)) + sizeof(t_shm_info));
-}
-
 char * read_pipe(int pipe[2]){
     int i = 0;
     char * msg;

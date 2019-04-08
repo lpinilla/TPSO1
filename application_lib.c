@@ -50,7 +50,7 @@ void save_buffer_to_file(void * shm_ptr, int n_of_files){
     FILE * file = fopen("result.txt", "w+a+");
     int i;
     for(i = 0; i < n_of_files;i++){
-        fprintf(file, "%s \n", (char *) (shm_ptr + sizeof(t_shm_info)) + i * HASH_NAME_SIZE);
+        fprintf(file, "%s \n", ((char *)shm_ptr + sizeof(t_shm_info) + i * HASH_NAME_SIZE));
     }
     fclose(file);
 }
@@ -70,31 +70,36 @@ void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){
 
 // funcion interna recursiva para encolar archivos y directorios 
 void enqueue_rec(Queue * files, char * file_name){
-        struct stat path_stat;
-        stat(file_name, &path_stat);
-        // usamos la macro para ver si es una file
-        if(S_ISREG(path_stat.st_mode)){
-            // si es una file es facil, la encolamos
-            enqueue(files ,&file_name);
-        }
-        // usamos otra macro para ver si es un directorio
-        else if(S_ISDIR(path_stat.st_mode)){
-            // si es un dir vemos todas las files adentro
-            DIR * dir;
-            struct dirent * ent;
-            dir = opendir(file_name);
-            while((ent = readdir(dir)) != NULL){
-                if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, "..")){
-                    char * new_file_name = malloc(strlen(ent->d_name) + strlen(file_name) + 1);
-                    // agrego al nuevo path
-                    sprintf(new_file_name, "%s/%s", file_name, ent->d_name);
-                    // llamamos con el nuevo path
-                    enqueue_rec(files, new_file_name);
+    struct stat path_stat;
+    stat(file_name, &path_stat);
+    // usamos la macro para ver si es una file
+    if(S_ISREG(path_stat.st_mode)){
+        // si es una file es facil, la encolamos
+        enqueue(files ,&file_name);
+    }
+    // usamos otra macro para ver si es un directorio
+    else if(S_ISDIR(path_stat.st_mode)){
+        // si es un dir vemos todas las files adentro
+        DIR * dir;
+        struct dirent * ent;
+        dir = opendir(file_name);
+        while((ent = readdir(dir)) != NULL){
+            if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, "..")){
+                char * new_file_name = malloc(strlen(ent->d_name) + strlen(file_name) + 1);
+                // agrego al nuevo path
+                if(file_name[strlen(file_name)] == '/'){
+                    sprintf(new_file_name, "%s%s", file_name, ent->d_name);
                 }
+                else{
+                    sprintf(new_file_name, "%s/%s", file_name, ent->d_name);
+                }
+                // llamamos con el nuevo path
+                enqueue_rec(files, new_file_name);
             }
-            free(file_name);
-            closedir(dir);
         }
+        free(file_name);
+        closedir(dir);
+    }
 }
 
 void enqueue_args(Queue * files, int argc, char ** argv){
@@ -110,6 +115,7 @@ void send_file(Queue * files, int pipe[2]){
     char * file_name;
     dequeue(files, &file_name);
     write(pipe[1], file_name, strlen(file_name)+1);
+    free(file_name);
 }
 
 int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
@@ -134,5 +140,63 @@ void close_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
         close(pipes[i].pipe_in[0]);
         //Cerramos el final de escritura del pipe de salida
         close(pipes[i].pipe_out[1]);
+    }
+}
+
+void fork_slaves(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]){
+    int i;
+    pid_t p;
+        // padre crea procesos esclavos y les envia trabajo
+    for(i=0; i<NUMBER_OF_SLAVES && getQueueSize(files)>0 ; i++){
+        p=fork();
+        if(p<0){
+            perror("Error: Fork failed.");
+            exit(EXIT_FAILURE);
+        }
+        else if(p==0){ // proceso hijo/esclavo
+            //Cerramos el final de escritura del pipe de salida
+            close(pipes[i].pipe_out[1]);
+            //Cerramos el final de lectura del pipe de entrada
+            close(pipes[i].pipe_in[0]);
+            // cerramos stdin
+            close(STDIN_FILENO);
+            // redireccionamos stdin del slave al final de lectura
+            // del pipe de salida
+            dup(pipes[i].pipe_out[0]);
+            //cerramos stdout
+            close(STDOUT_FILENO);
+            // redireccionamos stdout del slave al final de escritura
+            // del pipe de entrada
+            dup(pipes[i].pipe_in[1]);
+            char ** no_args = {'\0'};
+            execv("slave.so", no_args);
+        }
+        else{ // proceso padre
+            //Cerramos el final de lectura del pipe de salida
+            close(pipes[i].pipe_out[0]);
+            //Cerramos el final de escritura del pipe de entrada
+            close(pipes[i].pipe_in[1]);
+        }
+    }
+}
+
+void send_initial_files(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]){
+    int i;
+    if(INITIAL_CHARGE*NUMBER_OF_SLAVES <= getQueueSize(files)){
+        int j;
+        for(i=0; i<NUMBER_OF_SLAVES; i++){
+            char initial = INITIAL_CHARGE;
+            write(pipes[i].pipe_out[1],&initial,sizeof(initial));
+            for(j=0; j<INITIAL_CHARGE;j++){
+                send_file(files,pipes[i].pipe_out);
+            }
+        }
+    }
+    else{
+        char initial = 1;
+        for(i=0; i<NUMBER_OF_SLAVES && getQueueSize(files) > 0; i++){
+            write(pipes[i].pipe_out[1],&initial,sizeof(initial));
+            send_file(files,pipes[i].pipe_out);
+        }
     }
 }

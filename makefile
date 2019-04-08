@@ -27,6 +27,7 @@ clean:
 	@rm -f $(SOURCES) $(SOURCES:=.o)
 	@rm -f $(TESTS) $(TESTS:=.o) $(TESTS:=.so)
 	@rm -f $(TEST_SOURCES) $(TEST_SOURCES:=.o)
+	@rm -f result.txt
 
 debug: all #primero limpiar y compilar todo
 	#----------------------------------checkeos cppcheck

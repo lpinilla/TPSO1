@@ -1,111 +1,68 @@
 #include "application.h"
-#include <sys/types.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-
-#define INITIAL_CHARGE 5
 
 int main(int argc, char ** argv){
+
     // si no tenemos argumentos no hay nada que hacer
     if(argc==0 || argc == 1){
         return 1;
     }
-    //imprimir el pid para vision
-    printf("%d \n", getpid());
-    void * shm_ptr = create_shared_memory();
-    shm_info mem_info = initialize_shared_memory(shm_ptr);
-    // creamos lo necesario para select
+
+    void * shm_ptr;
+    shm_info mem_info;
+
     fd_set read_set;
     struct timeval tv;
-    FD_ZERO(&read_set);
-
-    Queue * files = newQueue();
-    queueInit(files, sizeof(char*));
-    enqueue_args(files, argc, argv);
-    int files_number = getQueueSize(files);
-
-    // se puede borrar despues(lo uso para probar save_buffer_to_file al final)
-    int aux = files_number;
-
     pipes_info pipes[NUMBER_OF_SLAVES];
 
+    Queue * files;
+    int total_files_number, actual_files, i;
+
+    // creamos e inicializamos la shm
+    shm_ptr = create_shared_memory();
+    mem_info = initialize_shared_memory(shm_ptr);
+
+    // inicializamos para select
+    FD_ZERO(&read_set);
+
+    // creamos e inicializamos la queue de files
+    files = newQueue();
+    queueInit(files, sizeof(char*));
+    enqueue_args(files, argc, argv);
+
+    total_files_number = getQueueSize(files);
+    actual_files = total_files_number;
+
+    
+    sleep(7);    
+
+    //imprimir el pid para vision
+    printf("%d\n", getpid());
+
     if(open_pipes(pipes) == -1){
-        perror("Error: Pipe creation failed.");
-        clear_shared_memory(shm_ptr, mem_info);
+        perror("Error: Pipe failed.");
         exit(EXIT_FAILURE);
     }
 
-    int i;
-    int p;
+    fork_slaves(files, pipes);
 
-    // padre crea procesos esclavos y les envia trabajo
-    for(i=0; i<NUMBER_OF_SLAVES && getQueueSize(files)>0 ; i++){
-        p=fork();
-        if(p<0){
-            perror("Error: Fork failed.");
-            clear_shared_memory(shm_ptr, mem_info);
-            exit(EXIT_FAILURE);
-        }
+    send_initial_files(files, pipes);
 
-        //Proceso hijo/esclavo
-        else if(p==0){
-            //Cerramos el final de escritura del pipe de salida
-            close(pipes[i].pipe_out[1]);
-            //Cerramos el final de lectura del pipe de entrada
-            close(pipes[i].pipe_in[0]);
-            // cerramos stdin
-            close(STDIN_FILENO);
-            // redireccionamos stdin del slave al final de lectura
-            // del pipe de salida
-            dup(pipes[i].pipe_out[0]);
-            //cerramos stdout
-            close(STDOUT_FILENO);
-            // redireccionamos stdout del slave al final de escritura
-            // del pipe de entrada
-            dup(pipes[i].pipe_in[1]);
-            char ** no_args = {'\0'};
-            execv("slave.so", no_args);
-        }
-
-        //Proceso padre
-        else{
-            //Cerramos el final de lectura del pipe de salida
-            close(pipes[i].pipe_out[0]);
-            //Cerramos el final de escritura del pipe de entrada
-            close(pipes[i].pipe_in[1]);
-        }
-    }
-
-    int j;
-    int actual_files = getQueueSize(files);
-    if(INITIAL_CHARGE*NUMBER_OF_SLAVES <= getQueueSize(files)){
-        for(i=0; i<NUMBER_OF_SLAVES; i++){
-            char initial = INITIAL_CHARGE;
-            write(pipes[i].pipe_out[1],&initial,sizeof(initial));
-            for(j=0; j<INITIAL_CHARGE;j++){
-                send_file(files,pipes[i].pipe_out);
-            }
-        }
-    }
-    else{
-        char initial = 1;
-        for(i=0; i<NUMBER_OF_SLAVES && getQueueSize(files) > 0; i++){
-            write(pipes[i].pipe_out[1],&initial,sizeof(initial));
-            send_file(files,pipes[i].pipe_out);
-        }
-    }
     while(actual_files>0){
         tv.tv_sec=10;
         tv.tv_usec=0;
-        for(int i=0; i<NUMBER_OF_SLAVES;i++){
+        for(i=0; i<NUMBER_OF_SLAVES;i++){
             FD_SET(pipes[i].pipe_in[0],&read_set);
         }
-        if(select(pipes[NUMBER_OF_SLAVES-1].pipe_in[1]+1,&read_set,NULL,NULL,&tv)<0){
-            perror("ERROR EN SELECT \n");
-            exit(EXIT_SUCCESS);
+        //el primer argumento de select debe ser el pipe mas grande de todos + 1, porque lo dice en la libreria de select
+        int maxfd = pipes[0].pipe_in[1];
+        for(i=1; i<NUMBER_OF_SLAVES;i++){
+            if(maxfd < pipes[i].pipe_in[1]){
+                maxfd = pipes[i].pipe_in[1];
+            }
+        }
+        if(select(maxfd+1, &read_set, NULL, NULL, &tv) < 0){
+            perror("Error: Select failed.\n");
+            exit(EXIT_FAILURE);
         }
         for(i=0; i<NUMBER_OF_SLAVES && actual_files>0; i++){
             if(FD_ISSET(pipes[i].pipe_in[0],&read_set)){
@@ -113,36 +70,22 @@ int main(int argc, char ** argv){
                 if(hash != NULL && strcmp(hash,"-1")!=0){
                     actual_files--;
                     write_hash_to_shm(shm_ptr, mem_info, hash);
-                    free(hash);
                 }
                 else if(getQueueSize(files)>0 && strcmp(hash,"-1")==0){
                     send_file(files,pipes[i].pipe_out);
-                    free(hash);
                 }
-            }
-            /*
-            send_file(files, pipes[i].pipe_out);
-            char * hash = read_pipe(pipes[i].pipe_in);
-            if(hash != NULL){
-                //Imprimo el hash TEMPORALMENTE hasta ver lo de la shm
-                //printf("%s\n", hash);
-                //------
-
-                files_number--;
-
-                //Guarda hash en la shm
-                write_hash_to_shm(shm_ptr, mem_info, hash);
                 free(hash);
             }
-            */
         }
     }
+
     mem_info->has_finished = 1;
+
     close_pipes(pipes);
 
     freeQueue(files);
 
-    save_buffer_to_file(shm_ptr, aux);
+    save_buffer_to_file(shm_ptr, total_files_number);
 
     //desvincularse a la memoria y liberarla
     clear_shared_memory(shm_ptr, mem_info);

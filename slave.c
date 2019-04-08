@@ -20,7 +20,9 @@ int main(void){
             free(msg);
         }
     }
+
     write(STDOUT_FILENO,"-1",sizeof("-1"));
+    
     while(1){
         char * msg = read_pipe(standars);
         if(msg != NULL){
