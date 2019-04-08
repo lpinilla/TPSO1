@@ -110,14 +110,15 @@ int main(int argc, char ** argv){
         for(i=0; i<NUMBER_OF_SLAVES && actual_files>0; i++){
             if(FD_ISSET(pipes[i].pipe_in[0],&read_set)){
                 char * hash = read_pipe(pipes[i].pipe_in);
-                actual_files--;
-                if(hash != NULL){
+                if(hash != NULL && strcmp(hash,"-1")!=0){
+                    actual_files--;
                     write_hash_to_shm(shm_ptr, mem_info, hash);
                     free(hash);
                 }
-                FD_SET(pipes[i].pipe_in[0],&read_set);
-                if(getQueueSize(files)>0)
+                else if(getQueueSize(files)>0 && strcmp(hash,"-1")==0){
                     send_file(files,pipes[i].pipe_out);
+                    free(hash);
+                }
             }
             /*
             send_file(files, pipes[i].pipe_out);
