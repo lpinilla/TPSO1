@@ -71,7 +71,6 @@ void check_pid(int argc, char ** argv){
 	}else{
 		//el argumento que me pasaste debe ser el pid
 		app_pid = atoi(argv[1]);	
-		printf("app's pid %d \n", app_pid);	
 	}
 	if( kill(app_pid, 0) < 0 ){
 			printf("Application is not running, exiting \n");

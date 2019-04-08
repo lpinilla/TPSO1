@@ -30,12 +30,16 @@ int main(void){
         printf("No files found \n");
     }
     //imprimir cartelito
-     printf("----------------------------------------------\n");
+    printf("----------------------------------------------\n");
     printf("\t Tasteful Framework \n");
     printf("----------------------------------------------\n");
     printf("Number of Tests Found: %d \n", n_of_suites_found);
     //agarrar todas las suites
     char ** all_suites = fetch_all_suites(n_of_suites_found);
+    if(all_suites == NULL){
+        printf("Malloc error \n");
+        exit(EXIT_FAILURE);
+    }
     //correr las suites
     run_all_suites(all_suites, n_of_suites_found);
     //hay que liberar el espacio
@@ -45,7 +49,9 @@ int main(void){
 char ** fetch_all_suites(int n_of_suites_found){
     //simplemente agarrar la salida de grep
     char * buffer = (char *) malloc(MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
+    if(buffer == NULL){return NULL;}
     char ** ret = (char **) malloc(n_of_suites_found);
+    if(ret == NULL){return NULL;}
     memset(buffer, 0x0, MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
     call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*.so'", buffer);
     //cleaning buffer
