@@ -22,9 +22,9 @@ int main(int argc, char ** argv){
         perror("Error: Max files shm is 1000.");
         exit(EXIT_FAILURE);
     }
-    
+
     //dormir para que vision se pueda conectar
-    sleep(7);   
+    sleep(7);
     fflush(stdout);
 
     if(open_pipes(pipes) == -1){

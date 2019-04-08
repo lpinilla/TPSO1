@@ -7,7 +7,7 @@ void call_command(char * command, char * buffer){
         return;
     }
     FILE * fd;
-    fd = popen(command, "r");
+    fd = popen((char *) command, "r");
     int i = 0;
     int c = 0;
     while ( (c=getc(fd)) != '\n' && c!=EOF ){

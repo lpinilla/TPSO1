@@ -56,16 +56,16 @@ void save_buffer_to_file(void * shm_ptr, int n_of_files){
 }
 
 void write_hash_to_shm(void * shm_ptr, shm_info mem_info, char * hash){   
+    //escribir
+    strcpy((char *) shm_ptr + mem_info->offset, hash);
+    //desplazarse
+    mem_info->offset += HASH_NAME_SIZE;
     //avisar que hay algo escrito
     if( sem_post(&mem_info->semaphore) < 0){
         perror("Error in wait");
         clear_shared_memory(shm_ptr, mem_info);
         exit(EXIT_FAILURE);
     } 
-    //escribir
-    strcpy((char *) shm_ptr + mem_info->offset, hash);
-    //desplazarse
-    mem_info->offset += HASH_NAME_SIZE;
 }
 
 // funcion interna recursiva para encolar archivos y directorios 

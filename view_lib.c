@@ -8,10 +8,10 @@ void print_hashes(void * hash_start, shm_info mem_info){
 		mem_disconnect(hash_start, mem_info);
 		exit(EXIT_FAILURE);
 	}
-	ts.tv_sec += 10; //limite del semáforo de 10 segundos
+	ts.tv_sec += 30; //limite del semáforo de 10 segundos
 	while( !mem_info->has_finished || (read_offset != mem_info->offset) ){
 		//esperar al semáforo
-		if( sem_wait(&mem_info->semaphore)){
+		if( sem_timedwait(&mem_info->semaphore, &ts)){
 			printf("error\n");
 			printf("%s\n", strerror(errno));
 			mem_disconnect(hash_start, mem_info);
@@ -64,7 +64,6 @@ void check_pid(int argc, char ** argv){
 	int app_pid = 0;
 	if(argc < 2){
 		scanf("%d", &app_pid);
-		printf("read pid: %d \n", app_pid);
 		if(app_pid == 0){
 			printf("Application's pid must be given\n");
 			exit(EXIT_FAILURE);
