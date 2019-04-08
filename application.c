@@ -92,9 +92,12 @@ int main(int argc, char ** argv){
     }
     else{
         char initial = 1;
-        for(int i=0; i<NUMBER_OF_SLAVES; i++){
+        for(int i=0; i<NUMBER_OF_SLAVES && getQueueSize(files) > 0; i++){
             write(pipes[i].pipe_out[1],&initial,sizeof(initial));
             send_file(files,pipes[i].pipe_out);
+            char * hash = read_pipe(pipes[i].pipe_in);
+            if(hash!=NULL)
+                write_hash_to_shm(shm_ptr, mem_info, hash);
         }
     }
     files_number = getQueueSize(files);
