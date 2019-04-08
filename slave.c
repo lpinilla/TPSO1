@@ -19,7 +19,6 @@ int main(void){
             free(msg);
         }
     }
-    /*
     while(1){
         char * msg = read_pipe(standars);
         if(msg != NULL){
@@ -32,5 +31,4 @@ int main(void){
             free(msg);
         }
     } 
-    */
 }

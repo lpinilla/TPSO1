@@ -90,10 +90,18 @@ int main(int argc, char ** argv){
             }
         }
     }
-    /*
-    // el padre recibe los hashes, los guarda en la shm y si quedan archivos por enviar a esclavos los envia
+    else{
+        char initial = 1;
+        for(int i=0; i<NUMBER_OF_SLAVES; i++){
+            write(pipes[i].pipe_out[1],&initial,sizeof(initial));
+            send_file(files,pipes[i].pipe_out);
+        }
+    }
+    files_number = getQueueSize(files);
     while(files_number>0){
+        printf("%d \n", files_number);
         for(i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
+            send_file(files, pipes[i].pipe_out);
             char * hash = read_pipe(pipes[i].pipe_in);
             if(hash != NULL){
                 //Imprimo el hash TEMPORALMENTE hasta ver lo de la shm
@@ -104,15 +112,10 @@ int main(int argc, char ** argv){
 
                 //Guarda hash en la shm
                 write_hash_to_shm(shm_ptr, mem_info, hash);
-
-                if(getQueueSize(files)>0){
-                    send_file(files, pipes[i].pipe_out);
-                }
                 free(hash);
             }
         }
     }
-    */
     mem_info->has_finished = 1;
     close_pipes(pipes);
 
