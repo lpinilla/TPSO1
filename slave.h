@@ -19,12 +19,12 @@ void call_md5(char * file_name, char * output);
 void load_file(char * file_name, int pipe[2]);
 
 //función para leer del pipe el archivo y procesarlo
-void read_parent_pipe(char * msg, int standards[]);
+void read_parent_pipe(int standards[]);
 
 //leer la primera carga de archivos
-void read_initial_files(char initial, char * msg, int standards[]);
+void read_initial_files(char initial, int standards[]);
 
 //leer los demás archivos
-void read_remaining_files(char initial, char * msg, int standards[]);
+void read_remaining_files(char initial, int standards[]);
 
 #endif
