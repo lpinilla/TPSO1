@@ -71,6 +71,7 @@ void save_buffer_to_file_test(){
     char * strings = (char *) malloc((2 * HASH_NAME_SIZE) + sizeof(t_shm_info));
     char cmd_ret = 0, buff[HASH_NAME_SIZE * 2];
     memset(strings, 0, (2 * HASH_NAME_SIZE) + sizeof(t_shm_info));
+    memset(buff, 0, HASH_NAME_SIZE * 2);
     strcpy(strings + sizeof(t_shm_info), "hello");
     strcpy(strings + sizeof(t_shm_info) + HASH_LENGTH, "world!");
     save_buffer_to_file(strings, n_of_files);
