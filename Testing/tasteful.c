@@ -92,7 +92,9 @@ char ** fetch_all_suites(int n_of_suites_found){
         printf("%s \n", ret[i]);
     }*/
     //liberar el buffer
-    free(buffer);
+    if(buffer != NULL){
+        free(buffer);
+    }
     return ret;
 }
 
