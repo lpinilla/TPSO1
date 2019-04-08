@@ -29,10 +29,6 @@ int main(int argc, char ** argv){
 
     // se puede borrar despues(lo uso para probar save_buffer_to_file al final)
     int aux = files_number;
-    
-    
-
-    
 
     pipes_info pipes[NUMBER_OF_SLAVES];
 
