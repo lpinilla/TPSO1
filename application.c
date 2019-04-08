@@ -2,6 +2,8 @@
 
 int main(int argc, char ** argv){
     check_app_arguments(argc);
+    //imprimir el pid para vision
+    printf("%d\n", getpid());
     // creamos e inicializamos la shm
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
@@ -16,11 +18,10 @@ int main(int argc, char ** argv){
     queueInit(files, sizeof(char*));
     enqueue_args(files, argc, argv);
     aux = total_files_number = getQueueSize(files);
-    //imprimir el pid para vision
-    printf("%d\n", getpid());
-    
+
     //dormir para que vision se pueda conectar
     sleep(7);   
+    fflush(stdout);
 
     if(open_pipes(pipes) == -1){
         perror("Error: Pipe failed.");

@@ -63,16 +63,16 @@ void mem_disconnect(void * ptr_shm, shm_info mem_info){
 void check_pid(int argc, char ** argv){	
 	int app_pid = 0;
 	if(argc < 2){
-		char app_pid_read[6];
-		read(STDIN_FILENO, app_pid_read, 6 * sizeof(char));	
-		app_pid_read[5] = 0;
-		app_pid = atoi(app_pid_read);
-		if(app_pid_read == NULL){
+		scanf("%d", &app_pid);
+		printf("read pid: %d \n", app_pid);
+		if(app_pid == 0){
 			printf("Application's pid must be given\n");
 			exit(EXIT_FAILURE);
 		}
 	}else{
-		app_pid = atoi(argv[1]);		
+		//el argumento que me pasaste debe ser el pid
+		app_pid = atoi(argv[1]);	
+		printf("app's pid %d \n", app_pid);	
 	}
 	if( kill(app_pid, 0) < 0 ){
 			printf("Application is not running, exiting \n");
