@@ -1,6 +1,7 @@
 #ifndef _VIEW_H_
 #define _VIEW_H_
 
+//librerías de C
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,8 +14,10 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <time.h>
+
+//librerías propias
 #include "application.h"
-#include "./utilities/utils.h"
+#include "utilities/utils.h"
 
 
 //opens or creates an existing shared memory object.

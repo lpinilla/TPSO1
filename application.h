@@ -1,19 +1,22 @@
 #ifndef _APPLICATION_H_
 #define _APPLICATION_H_
 
+//librerías de C
 #include <sys/types.h>
 #include <sys/unistd.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <semaphore.h>
 #include <sys/select.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/stat.h>        /* For mode constants */
+#include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>           /* For O_* constants */
 #include <string.h>
 #include <dirent.h>
+
+//librerías propias
 #include "utilities/queue.h"
 #include "utilities/utils.h"
 #include "slave.h"
@@ -70,7 +73,7 @@ int open_pipes(pipes_info pipes[NUMBER_OF_SLAVES]);
 void close_pipes(pipes_info pipes[NUMBER_OF_SLAVES]);
 
 //realiza la creacion de hijos esclavos y deja los pipes listos
-void fork_slaves(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]);
+void fork_slaves(pipes_info pipes[NUMBER_OF_SLAVES]);
 
 //envia los archivos iniciales a los esclavos
 void send_initial_files(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]);

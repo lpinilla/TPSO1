@@ -33,7 +33,7 @@ int main(int argc, char ** argv){
     actual_files = total_files_number;
 
     
-    sleep(7);    
+    //sleep(7);    
 
     //imprimir el pid para vision
     printf("%d\n", getpid());
@@ -43,7 +43,7 @@ int main(int argc, char ** argv){
         exit(EXIT_FAILURE);
     }
 
-    fork_slaves(files, pipes);
+    fork_slaves(pipes);
 
     send_initial_files(files, pipes);
 
@@ -53,7 +53,7 @@ int main(int argc, char ** argv){
         for(i=0; i<NUMBER_OF_SLAVES;i++){
             FD_SET(pipes[i].pipe_in[0],&read_set);
         }
-        //el primer argumento de select debe ser el pipe mas grande de todos + 1, porque lo dice en la libreria de select
+        //el primer argumento de select debe ser el pipe mas grande de todos + 1, aclarado en libreria de select
         int maxfd = pipes[0].pipe_in[1];
         for(i=1; i<NUMBER_OF_SLAVES;i++){
             if(maxfd < pipes[i].pipe_in[1]){

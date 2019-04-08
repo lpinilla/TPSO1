@@ -143,11 +143,11 @@ void close_pipes(pipes_info pipes[NUMBER_OF_SLAVES]){
     }
 }
 
-void fork_slaves(Queue * files, pipes_info pipes[NUMBER_OF_SLAVES]){
+void fork_slaves(pipes_info pipes[NUMBER_OF_SLAVES]){
     int i;
     pid_t p;
         // padre crea procesos esclavos y les envia trabajo
-    for(i=0; i<NUMBER_OF_SLAVES && getQueueSize(files)>0 ; i++){
+    for(i=0; i<NUMBER_OF_SLAVES; i++){
         p=fork();
         if(p<0){
             perror("Error: Fork failed.");

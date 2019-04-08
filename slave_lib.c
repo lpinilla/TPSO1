@@ -1,33 +1,25 @@
 #include "slave.h"
 
-#define PATH_LEN 256
-#define MD5_LEN 32
-
-#define STR_VALUE(val) #val
-#define STR(name) STR_VALUE(name)
-
-int call_md5(char *file_name, char *output)
+void call_md5(char *file_name, char *output)
 {
-    #define MD5SUM_CMD_FMT "md5sum %." STR(PATH_LEN) "s"
-    char cmd[PATH_LEN + sizeof (MD5SUM_CMD_FMT)];
-    sprintf(cmd, MD5SUM_CMD_FMT, file_name);
-    #undef MD5SUM_CMD_FMT
+    char command[MAX_FILE_NAME + 13];
+    sprintf(command, "md5sum %256s", file_name);
 
-	sprintf(output, "%s: ", file_name);
+    FILE *p = popen(command, "r");
 
-    FILE *p = popen(cmd, "r");
-    if (p == NULL) return 0;
-
-    int aux = strlen(output);
-    int i, ch;
-    for (i = aux; i < (MD5_LEN + aux) && isxdigit(ch = fgetc(p)); i++) {
-        output[i] = ch;
+    if (p == NULL){
+        perror("Error: Opening file.");
+        exit(EXIT_FAILURE);
     }
 
-    output[i] = '\0';
-    pclose(p);
+    sprintf(output, "%s: ", file_name);
+    int i, c, aux = strlen(output);
+    for (i = aux; i < (HASH_LENGTH + aux) && isxdigit(c = fgetc(p)); i++) {
+        output[i] = c;
+    }
+    output[i] = 0;
 
-    return i == MD5_LEN;
+    pclose(p);
 }
 
 void load_file(char * file_name, int pipe[2]){  
