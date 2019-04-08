@@ -1,4 +1,10 @@
 #include "application.h"
+#include <sys/types.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 
 #define INITIAL_CHARGE 5
 
@@ -11,6 +17,10 @@ int main(int argc, char ** argv){
     printf("%d \n", getpid());
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
+    // creamos lo necesario para select
+    fd_set read_set;
+    struct timeval tv;
+    FD_ZERO(&read_set);
 
     Queue * files = newQueue();
     queueInit(files, sizeof(char*));
@@ -74,6 +84,7 @@ int main(int argc, char ** argv){
     }
 
     int j;
+    int actual_files = getQueueSize(files);
     if(INITIAL_CHARGE*NUMBER_OF_SLAVES <= getQueueSize(files)){
         for(i=0; i<NUMBER_OF_SLAVES; i++){
             char initial = INITIAL_CHARGE;
@@ -82,28 +93,37 @@ int main(int argc, char ** argv){
                 send_file(files,pipes[i].pipe_out);
             }
         }
-        for(i=0; i<NUMBER_OF_SLAVES; i++){
-            for(j=0; j<INITIAL_CHARGE;j++){
-                char * hash = read_pipe(pipes[i].pipe_in);
-                if(hash !=NULL){
-                    write_hash_to_shm(shm_ptr, mem_info, hash);
-                }
-            }
-        }
     }
     else{
         char initial = 1;
         for(i=0; i<NUMBER_OF_SLAVES && getQueueSize(files) > 0; i++){
             write(pipes[i].pipe_out[1],&initial,sizeof(initial));
             send_file(files,pipes[i].pipe_out);
-            char * hash = read_pipe(pipes[i].pipe_in);
-            if(hash!=NULL)
-                write_hash_to_shm(shm_ptr, mem_info, hash);
         }
     }
-    files_number = getQueueSize(files);
-    while(files_number>0){
-        for(i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
+    while(actual_files>0){
+        tv.tv_sec=10;
+        tv.tv_usec=0;
+        for(int i=0; i<NUMBER_OF_SLAVES;i++){
+            FD_SET(pipes[i].pipe_in[0],&read_set);
+        }
+        if(select(pipes[NUMBER_OF_SLAVES-1].pipe_in[1]+1,&read_set,NULL,NULL,&tv)<0){
+            perror("ERROR EN SELECT \n");
+            exit(EXIT_SUCCESS);
+        }
+        for(i=0; i<NUMBER_OF_SLAVES && actual_files>0; i++){
+            if(FD_ISSET(pipes[i].pipe_in[0],&read_set)){
+                char * hash = read_pipe(pipes[i].pipe_in);
+                actual_files--;
+                if(hash != NULL){
+                    write_hash_to_shm(shm_ptr, mem_info, hash);
+                    free(hash);
+                }
+                FD_SET(pipes[i].pipe_in[0],&read_set);
+                if(getQueueSize(files)>0)
+                    send_file(files,pipes[i].pipe_out);
+            }
+            /*
             send_file(files, pipes[i].pipe_out);
             char * hash = read_pipe(pipes[i].pipe_in);
             if(hash != NULL){
@@ -117,6 +137,7 @@ int main(int argc, char ** argv){
                 write_hash_to_shm(shm_ptr, mem_info, hash);
                 free(hash);
             }
+            */
         }
     }
     mem_info->has_finished = 1;
