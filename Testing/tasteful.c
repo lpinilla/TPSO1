@@ -51,7 +51,10 @@ char ** fetch_all_suites(int n_of_suites_found){
     char * buffer = (char *) malloc(MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
     if(buffer == NULL){return NULL;}
     char ** ret = (char **) malloc(n_of_suites_found);
-    if(ret == NULL){return NULL;}
+    if(ret == NULL){
+        free(buffer);
+        return NULL;
+    }
     memset(buffer, 0x0, MAX_FILE_NAME_LENGTH  * n_of_suites_found * sizeof(char));
     call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*.so'", buffer);
     //cleaning buffer
@@ -70,6 +73,12 @@ char ** fetch_all_suites(int n_of_suites_found){
             if(buffer[i] == '|'){ //encontramos el nombre de un archivo
                 //printf("aux: %d i: %d\n", aux, i); //testing
                 ret[ret_index] = malloc(aux * sizeof(char));    //hay que liberarlo
+                if(ret[ret_index] == NULL){
+                    printf("Problem allocating space for name\n");
+                    free(buffer);
+                    free(ret);
+                    return NULL;
+                }
                 strncpy(ret[ret_index], &buffer[i - aux + 1], (size_t) aux - 1);
                 ret[ret_index + aux] = 0;
                 aux = 0;
@@ -89,6 +98,10 @@ char ** fetch_all_suites(int n_of_suites_found){
 
 int find_tests(){ //seguro se puede re optimizar a partir del comando anterior pero bueno
     char * buffer = (char *) malloc(sizeof(int));
+    if(buffer == NULL){
+        perror("malloc");
+        return 0;
+    }
     call_command("ls | grep -P '[tT][eE][sS][tT][_-]*[a-z]*[A-Z]*[0-9]*[_-]*[a-z]*[A-Z]*.so' | wc -l", buffer);
     int ret = atoi(buffer);
     free(buffer);
