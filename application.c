@@ -1,5 +1,7 @@
 #include "application.h"
 
+#define INITIAL_CHARGE 5
+
 int main(int argc, char ** argv){
     // si no tenemos argumentos no hay nada que hacer
     if(argc==0 || argc == 1){
@@ -9,7 +11,6 @@ int main(int argc, char ** argv){
     printf("%d \n", getpid());
     void * shm_ptr = create_shared_memory();
     shm_info mem_info = initialize_shared_memory(shm_ptr);
-    sleep(7);
 
     Queue * files = newQueue();
     queueInit(files, sizeof(char*));
@@ -69,11 +70,27 @@ int main(int argc, char ** argv){
             close(pipes[i].pipe_out[0]);
             //Cerramos el final de escritura del pipe de entrada
             close(pipes[i].pipe_in[1]);
-            //Envia un archivo a cada hijo
-            send_file(files, pipes[i].pipe_out);
         }
     }
 
+    if(INITIAL_CHARGE*NUMBER_OF_SLAVES <= getQueueSize(files)){
+        for(int i=0; i<NUMBER_OF_SLAVES; i++){
+            char initial = INITIAL_CHARGE;
+            write(pipes[i].pipe_out[1],&initial,sizeof(initial));
+            for(int j=0; j<INITIAL_CHARGE;j++){
+                send_file(files,pipes[i].pipe_out);
+            }
+        }
+        for(int i=0; i<NUMBER_OF_SLAVES; i++){
+            for(int j=0; j<INITIAL_CHARGE;j++){
+                char * hash = read_pipe(pipes[i].pipe_in);
+                if(hash !=NULL){
+                    write_hash_to_shm(shm_ptr, mem_info, hash);
+                }
+            }
+        }
+    }
+    /*
     // el padre recibe los hashes, los guarda en la shm y si quedan archivos por enviar a esclavos los envia
     while(files_number>0){
         for(i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
@@ -95,6 +112,7 @@ int main(int argc, char ** argv){
             }
         }
     }
+    */
     mem_info->has_finished = 1;
     close_pipes(pipes);
 
