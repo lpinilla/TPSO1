@@ -99,7 +99,6 @@ int main(int argc, char ** argv){
     }
     files_number = getQueueSize(files);
     while(files_number>0){
-        printf("%d \n", files_number);
         for(i=0; i<NUMBER_OF_SLAVES && files_number>0; i++){
             send_file(files, pipes[i].pipe_out);
             char * hash = read_pipe(pipes[i].pipe_in);
