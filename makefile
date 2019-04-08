@@ -14,7 +14,7 @@ TEST_SOURCES = utilities/sources/queue Testing/testing_suite utilities/sources/u
 CROSS_TOOL =
 CC_C = $(CROSS_TOOL) gcc
 
-CFLAGS = -Wall -Werror -g -pthread
+CFLAGS = -Wall -g -pthread -std=gnu99
 CPPFLAGS = --quiet --enable=all --force --inconclusive --suppress=missingIncludeSystem --suppress=unusedFunction --inline-suppr
 
 all: clean $(TARGETS)
