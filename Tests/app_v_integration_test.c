@@ -176,7 +176,7 @@ void write_and_read_continuous_test(){
   close(fd[0]);
   //comparar
   aux = strcmp("dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n", buffer[0]);
-  aux += strcmp(buffer[1], " \n4f83495c139c7d9b23791e09f0d9321b  ../README.md");
+  aux += strcmp(buffer[1], " \nb1c856e726f0368927badab296266c8d  ../README.md");
   //limpiar y liberar memorias
   clear_shared_memory(shm_ptr, mem_info);
   free(str);
@@ -248,7 +248,7 @@ void multiple_write_with_sleep(){
   read(fd[0], output[1], 48 * sizeof(char));
   read(fd[0], output[2], 55 * sizeof(char));
   aux =  strcmp(output[0],  "dbbc672b0dec675712e78f98cfe88c25  ../Sistemas_Operativos_TP1_Q1_2019.pdf\n");  
-  aux += strcmp(output[1], " \n4f83495c139c7d9b23791e09f0d9321b  ../README.md");  
+  aux += strcmp(output[1], " \nb1c856e726f0368927badab296266c8d  ../README.md");  
   aux += strcmp(output[2], "\n \n807a23aca22344e4426f1f73eb2c0109  ./hashing_file.txt");
   //limpiar la memoria
   clear_shared_memory(shm_ptr, mem_info);
