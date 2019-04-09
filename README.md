@@ -5,6 +5,11 @@ Para compilar el programa
 ```bash
     make all
 ```
+Para correr los tests
+```bash
+    make test
+```
+
 Para ejecutar el programa
 ```bash
     ./application.so PATH | ./view.so
